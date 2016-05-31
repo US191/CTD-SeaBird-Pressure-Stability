@@ -53,9 +53,6 @@ for i_sta = stations
 end
 
 %% Result
-diff_pressure_deb_fin(3) = NaN;
-diff_pressure_deb_fin(40) = NaN;
-diff_pressure_deb_fin(13) = NaN;
 mean_diff_pressure = nanmean(abs(diff_pressure_deb_fin));
 fprintf(1, 'Mean : %f db\n', mean_diff_pressure);
 
