@@ -14,6 +14,8 @@ classdef serial < handle
   
   properties (Access = public)
     sp
+    trame
+    available = false
   end
   
   methods % public
@@ -40,7 +42,7 @@ classdef serial < handle
       obj.sp.BytesAvailableFcnMode = 'terminator';
       obj.sp.Terminator = obj.Terminator;
       % the callback
-      obj.sp.BytesAvailableFcn = {@(src, event) receive(obj, src, event)};
+      obj.sp.BytesAvailableFcn = {@(src, event) obj.receive()};
     end
     
     % get the serial port name, eg COM9
@@ -104,6 +106,7 @@ classdef serial < handle
     % close the serial port sp and delete from memory
     function close(obj)
       if ~isempty(obj.sp)
+        obj.available = false;
         fclose(obj.sp);
         delete(obj.sp);
         clear obj.sp;
@@ -114,10 +117,11 @@ classdef serial < handle
   
   % receive read data from serial port and display it
   methods (Access = private)
-    function receive(obj, src, ~)
-      trame = fgetl(src);
-      fprintf(1, 'Recu:');
-      fprintf(1, '%s\n',trame);
+    function receive(obj, ~)
+      obj.trame = fgetl(obj.sp);
+      obj.available = true;
+      %fprintf(1, 'Recu: ');
+      %fprintf(1, '%s\n',trame);
     end
   end % end of private methods
   
