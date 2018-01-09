@@ -12,14 +12,16 @@ classdef serial < handle
     Status = 'not connected'
   end
   
-  properties (Access = public)
+  properties (Access = private)
     sp = [];
-    sentence = []
-    available = false
+  end
+  
+  properties (Access = protected)
+     sentence = []
   end
   
   events
-    SentenceAvailable
+    sentenceAvailable
   end
   
   methods % public
@@ -49,12 +51,12 @@ classdef serial < handle
       obj.sp.BytesAvailableFcn = {@(src, event) obj.receive()};
     end
     
-    % get the serial port name, eg COM9
+    % set the serial port name, eg COM9
     function set.Port(obj, port)
       obj.Port = port;
     end
     
-    % get the speed, eg 4800 or 9600 bds
+    % set the speed, eg 4800 or 9600 bds
     function set.BaudRate(obj, baudRate)
       switch baudRate
         case {300,600,1200,2400,4800,9600,19200,57600,112000}
@@ -64,7 +66,7 @@ classdef serial < handle
       end
     end
     
-    % get the databits, eg 7 or 8
+    % set the databits, eg 7 or 8
     function set.DataBits(obj, dataBits)
       switch dataBits
         case {7,8}
@@ -74,7 +76,7 @@ classdef serial < handle
       end
     end
     
-    % get the parity, eg none, odd or even
+    % set the parity, eg none, odd or even
     function set.Parity(obj, parity)
       switch parity
         case {'none','odd','even'}
@@ -87,13 +89,23 @@ classdef serial < handle
       end
     end
     
-    % get the stop bit, eg 1 or 2
+    % set the stop bit, eg 1 or 2
     function set.StopBits(obj, stopBits)
       switch stopBits
         case {1,2}
           obj.StopBits = stopBits;
         otherwise
           error('MATLAB:gps:invalid stop bit value: %d', stopBits);
+      end
+    end
+    
+        % set the terminator end line
+    function set.Terminator(obj, terminator)
+      switch terminator
+        case {'CR/LF','CR','LF'}
+          obj.Terminator = terminator;
+        otherwise
+          error('MATLAB:gps:invalid terminator character, value : %s', terminator);
       end
     end
     
@@ -110,7 +122,6 @@ classdef serial < handle
     % close the serial port sp and delete from memory
     function close(obj)
       if ~isempty(obj.sp)
-        obj.available = false;
         fclose(obj.sp);
         delete(obj.sp);
         clear obj.sp;
@@ -125,12 +136,20 @@ classdef serial < handle
   methods (Access = private)
     function receive(obj, ~)
       obj.sentence = fgetl(obj.sp);
-      notify(obj, 'SentenceAvailable');
-      %obj.available = true;
+      notify(obj, 'sentenceAvailable');
       %fprintf(1, 'Recu: ');
       %fprintf(1, '%s\n',sentence);
     end
   end % end of private methods
+  
+  methods (Static)
+    
+    % Discover returns a list of all serial ports on a system.
+    function list = Discover()
+      list = seriallist;
+    end
+    
+  end % end of static methods
   
 end % end of class
 

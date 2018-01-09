@@ -10,14 +10,14 @@ classdef gps < us191.serial
     Longitude
   end
   
-  properties
-    ListenerHandle % Property for listener handle
+  properties (Access = private)
+    listenerHandle % Property for listener handle
   end
   
   methods  % public
     function obj = gps(port)
       obj@us191.serial(port);
-      obj.ListenerHandle = addlistener(obj,'SentenceAvailable',@obj.handleEvnt);
+      obj.listenerHandle = addlistener(obj,'sentenceAvailable',@obj.handleEvnt);
     end
     
     function read(obj)
@@ -45,7 +45,7 @@ classdef gps < us191.serial
     end % end of function handleEvnt
     
     function close(obj)
-      delete(obj.ListenerHandle)
+      delete(obj.listenerHandle)
       % call Superclass serial from package us191
       close@us191.serial(obj);
     end
