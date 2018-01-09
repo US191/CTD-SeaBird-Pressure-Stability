@@ -2,7 +2,7 @@ classdef gps < us191.serial
   %UNTITLED Summary of this class goes here
   %   Detailed explanation goes here
   
-  properties
+  properties (Access = private)
     Time
     Lat_deg
     Lon_deg
