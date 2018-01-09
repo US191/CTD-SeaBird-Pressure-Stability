@@ -17,20 +17,22 @@ classdef gps < us191.serial
   methods  % public
     function obj = gps(port)
       obj@us191.serial(port);
-      obj.ListenerHandle = addlistener(obj,'SentenceAvailable',@gps.handleEvnt);
+      obj.ListenerHandle = addlistener(obj,'SentenceAvailable',@obj.handleEvnt);
     end
     
     function read(obj)
-      fprintf(1, 'Time: %s Lat: %s Long: %s\n', obj.Time,obj.Lat_deg, obj.Lon_deg);
+      if ~isempty(obj.sentence)
+        fprintf(1, 'Time: %s Lat: %s Long: %s\n', obj.Time,obj.Lat_deg, obj.Lon_deg);
+      end
     end
     
-    function handleEvnt(obj)
-      
-      ident = textscan(obj.trame, '$%*2s%3s*[^\n]', 'delimiter', ',');
+    
+    function handleEvnt(obj,~,~)
+      ident = textscan(obj.sentence, '$%*2s%3s*[^\n]', 'delimiter', ',');
       ident = char(ident{1});
       switch ident
         case 'GGA'
-          s = textscan(obj.trame, '$GPGGA %s %s %s %s %s', 'delimiter', ',');
+          s = textscan(obj.sentence, '$GPGGA %s %s %s %s %s', 'delimiter', ',');
           if( ~isempty(s{1}))
             obj.Time = char(s{1});
             obj.Lat_deg = char(s{2}); lat_s = char(s{3});
@@ -38,7 +40,7 @@ classdef gps < us191.serial
             %obj.Latitude = str2double(obj.DegMinToDec(obj.Lat_deg, lat_s));
             %obj.Longitude = str2double(obj.DegMinToDec(obj.Lon_deg, lon_s));
             
-          end  
+          end
       end
     end % end of function handleEvnt
     

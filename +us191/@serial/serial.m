@@ -13,8 +13,8 @@ classdef serial < handle
   end
   
   properties (Access = public)
-    sp
-    trame
+    sp = [];
+    sentence = []
     available = false
   end
   
@@ -115,6 +115,8 @@ classdef serial < handle
         delete(obj.sp);
         clear obj.sp;
       end
+      obj.sentence = [];
+      obj.sp = [];
     end
     
   end % end of public methods
@@ -122,11 +124,11 @@ classdef serial < handle
   % receive read data from serial port and display it
   methods (Access = private)
     function receive(obj, ~)
-      obj.trame = fgetl(obj.sp);
+      obj.sentence = fgetl(obj.sp);
       notify(obj, 'SentenceAvailable');
       %obj.available = true;
       %fprintf(1, 'Recu: ');
-      %fprintf(1, '%s\n',trame);
+      %fprintf(1, '%s\n',sentence);
     end
   end % end of private methods
   
