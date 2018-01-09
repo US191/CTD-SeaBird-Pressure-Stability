@@ -3,11 +3,9 @@ classdef gps < us191.serial
   %   Detailed explanation goes here
   
   properties (Access = private)
-    Time
-    Lat_deg
-    Lon_deg
-    Latitude
-    Longitude
+    time
+    latitude
+    longitude
   end
   
   properties (Access = private)
@@ -22,7 +20,7 @@ classdef gps < us191.serial
     
     function read(obj)
       if ~isempty(obj.sentence)
-        fprintf(1, 'Time: %s Lat: %s Long: %s\n', obj.Time,obj.Lat_deg, obj.Lon_deg);
+        fprintf(1, 'Time: %6.0f Lat: %8.5f Long: %9.5f\n', obj.time,obj.latitude, obj.longitude);
       end
     end
     
@@ -34,11 +32,9 @@ classdef gps < us191.serial
         case 'GGA'
           s = textscan(obj.sentence, '$GPGGA %s %s %s %s %s', 'delimiter', ',');
           if( ~isempty(s{1}))
-            obj.Time = char(s{1});
-            obj.Lat_deg = char(s{2}); lat_s = char(s{3});
-            obj.Lon_deg = char(s{4}); lon_s = char(s{5});
-            %obj.Latitude = str2double(obj.DegMinToDec(obj.Lat_deg, lat_s));
-            %obj.Longitude = str2double(obj.DegMinToDec(obj.Lon_deg, lon_s));
+            obj.time = str2double(char(s{1}));
+            obj.latitude = str2double(us191.gps.degMinToDec(char(s{2}), char(s{3})));
+            obj.longitude = str2double(us191.gps.degMinToDec(char(s{4}), char(s{5})));
             
           end
       end
@@ -52,9 +48,9 @@ classdef gps < us191.serial
     
   end % end of public methods
   
-  methods(Access = private)
+  methods(Access = private, Static)
     
-    function dec = DegMinToDec(obj,degmin,EWNS)
+    function dec = degMinToDec(degmin,EWNS)
       % Latitude string format: ddmm.mmmm (dd = degrees)
       % Longitude string format: dddmm.mmmm (ddd = degrees)
       
@@ -77,7 +73,7 @@ classdef gps < us191.serial
             return;
         end
         
-        minutes = (strdouble(degmin(min_start:length(degmin))))/60; % convert minutes to decimal degrees
+        minutes = (str2double(degmin(min_start:length(degmin))))/60; % convert minutes to decimal degrees
         
         dec = num2str(deg + minutes,'%11.10g'); % degrees as decimal number
         
