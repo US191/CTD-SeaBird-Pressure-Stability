@@ -18,6 +18,10 @@ classdef serial < handle
     available = false
   end
   
+  events
+    SentenceAvailable
+  end
+  
   methods % public
     
     % class gps constructor
@@ -119,7 +123,8 @@ classdef serial < handle
   methods (Access = private)
     function receive(obj, ~)
       obj.trame = fgetl(obj.sp);
-      obj.available = true;
+      notify(obj, 'SentenceAvailable');
+      %obj.available = true;
       %fprintf(1, 'Recu: ');
       %fprintf(1, '%s\n',trame);
     end

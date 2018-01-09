@@ -3,39 +3,54 @@ classdef gps < us191.serial
   %   Detailed explanation goes here
   
   properties
-    time
-    lat_deg
-    lon_deg
-    latitude
-    longitude
+    Time
+    Lat_deg
+    Lon_deg
+    Latitude
+    Longitude
   end
   
-  methods
+  properties
+    ListenerHandle % Property for listener handle
+  end
+  
+  methods  % public
     function obj = gps(port)
       obj@us191.serial(port);
+      obj.ListenerHandle = addlistener(obj,'SentenceAvailable',@gps.handleEvnt);
     end
     
     function read(obj)
-      while true
-        if obj.available
-          ident = textscan(obj.trame, '$%*2s%3s*[^\n]', 'delimiter', ',');
-          ident = char(ident{1});
-          switch ident
-            case 'GGA'
-              s = textscan(obj.trame, '$GPGGA %s %s %s %s %s', 'delimiter', ',');
-              if( ~isempty(s{1}))
-                obj.time = char(s{1});
-                obj.lat_deg = char(s{2}); lat_s = char(s{3});
-                obj.lon_deg = char(s{4}); lon_s = char(s{5});
-                %obj.latitude = str2double(obj.DegMinToDec(obj.lat_deg, lat_s));
-                %obj.longitude = str2double(obj.DegMinToDec(obj.lon_deg, lon_s));
-                fprintf(1, 'Time: %s Lat: %s Long: %s\n', obj.time,obj.lat_deg, obj.lon_deg);
-              end
-              obj.available = false;
-          end
-        end
-      end
+      fprintf(1, 'Time: %s Lat: %s Long: %s\n', obj.Time,obj.Lat_deg, obj.Lon_deg);
     end
+    
+    function handleEvnt(obj)
+      
+      ident = textscan(obj.trame, '$%*2s%3s*[^\n]', 'delimiter', ',');
+      ident = char(ident{1});
+      switch ident
+        case 'GGA'
+          s = textscan(obj.trame, '$GPGGA %s %s %s %s %s', 'delimiter', ',');
+          if( ~isempty(s{1}))
+            obj.Time = char(s{1});
+            obj.Lat_deg = char(s{2}); lat_s = char(s{3});
+            obj.Lon_deg = char(s{4}); lon_s = char(s{5});
+            %obj.Latitude = str2double(obj.DegMinToDec(obj.Lat_deg, lat_s));
+            %obj.Longitude = str2double(obj.DegMinToDec(obj.Lon_deg, lon_s));
+            
+          end  
+      end
+    end % end of function handleEvnt
+    
+    function close(obj)
+      delete(obj.ListenerHandle)
+      % call Superclass serial from package us191
+      close@us191.serial(obj);
+    end
+    
+  end % end of public methods
+  
+  methods(Access = private)
     
     function dec = DegMinToDec(obj,degmin,EWNS)
       % Latitude string format: ddmm.mmmm (dd = degrees)
@@ -44,15 +59,15 @@ classdef gps < us191.serial
       if nargin ~= 2
         dec = '-2';
       else
-        % Determine  if data is latitude or longitude
+        % Determine  if data is Latitude or Longitude
         switch length(strtok(degmin,'.'))
           case 4
-            % latitude data
-            deg = str2double(degmin(1:2)); % extract degrees portion of latitude string and convert to number
+            % Latitude data
+            deg = str2double(degmin(1:2)); % extract degrees portion of Latitude string and convert to number
             min_start = 3;              % position in string for start of minutes
           case 5
-            % longitude data
-            deg = str2double(degmin(1:3)); % extract degrees portion of longitude string and convert to number
+            % Longitude data
+            deg = str2double(degmin(1:3)); % extract degrees portion of Longitude string and convert to number
             min_start = 4;              % position in string for start of minutes
           otherwise
             % data not in correct format
@@ -76,8 +91,9 @@ classdef gps < us191.serial
             % do nothing
         end
       end
-    end % end of DegMinToDec
+    end % end of private function DegMinToDec
     
-  end % end of public method
+  end % end of private methods
+  
 end % end of gps class
 
