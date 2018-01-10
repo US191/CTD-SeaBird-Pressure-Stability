@@ -30,8 +30,7 @@ classdef serial < handle
     % class gps constructor
     function obj = serial(varargin)
       if( isa(varargin{1}, 'char'))
-        % add test for a valid port with regexp,
-        % eg COMx under windows, /dev/ttyS* for Linux
+        % set serial port with first argument, eg COMx
         obj.setPort(varargin{1});
       else
         error('us191:serial', '%s is an invalid serial port ', varargin{1});
@@ -84,6 +83,9 @@ classdef serial < handle
     
     % set the serial port name, eg COM9
     function setPort(obj, port)
+      % Todos: add more tests
+      % add test for a valid port with regexp,
+      % eg COMx under windows, /dev/ttyS* for Linux
       obj.port = port;
     end
     
