@@ -17,7 +17,7 @@ classdef serial < handle
   end
   
   properties (Access = protected)
-     sentence = []
+    sentence = []
   end
   
   events
@@ -99,7 +99,7 @@ classdef serial < handle
       end
     end
     
-        % set the terminator end line
+    % set the terminator end line
     function set.Terminator(obj, terminator)
       switch terminator
         case {'CR/LF','CR','LF'}
@@ -144,9 +144,19 @@ classdef serial < handle
   
   methods (Static)
     
+    % prototype of function that was in private directory
+    % ------------------------------------------------
+    getAvailableComPort();
+    
     % Discover returns a list of all serial ports on a system.
     function list = Discover()
-      list = seriallist;
+      % seraillist was nntroduced in R2017a, version 9.2.x
+      if verLessThan('matlab','9.2')
+        list = us191.serial.getAvailableComPort();
+      else
+        % seriallist return string type not available before R2017a
+        list = cellstr(seriallist)';
+      end
     end
     
   end % end of static methods
