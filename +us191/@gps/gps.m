@@ -1,11 +1,12 @@
 classdef gps < us191.serial
-  %UNTITLED Summary of this class goes here
+  %Gps receive and print GPS data from serial RS232 line
   %   Detailed explanation goes here
   
   properties (Access = private)
     time
     latitude
     longitude
+    quality = false
   end
   
   properties (Access = private)
@@ -13,29 +14,40 @@ classdef gps < us191.serial
   end
   
   methods  % public
-    function obj = gps(port)
-      obj@us191.serial(port);
+    function obj = gps(varargin)
+      obj@us191.serial(varargin{:});
       obj.listenerHandle = addlistener(obj,'sentenceAvailable',@obj.handleEvnt);
     end
     
     function read(obj)
+      if isempty(obj.sp)
+        obj.open()
+        pause(1)  % wait for one second
+      end
       if ~isempty(obj.sentence)
         fprintf(1, 'Time: %6.0f Lat: %8.5f Long: %9.5f\n', obj.time,obj.latitude, obj.longitude);
       end
     end
-    
     
     function handleEvnt(obj,~,~)
       ident = textscan(obj.sentence, '$%*2s%3s*[^\n]', 'delimiter', ',');
       ident = char(ident{1});
       switch ident
         case 'GGA'
-          s = textscan(obj.sentence, '$GPGGA %s %s %s %s %s', 'delimiter', ',');
-          if( ~isempty(s{1}))
-            obj.time = str2double(char(s{1}));
-            obj.latitude = str2double(us191.gps.degMinToDec(char(s{2}), char(s{3})));
-            obj.longitude = str2double(us191.gps.degMinToDec(char(s{4}), char(s{5})));
-            
+          s = textscan(obj.sentence, '$GPGGA %s %s %s %s %s %s', 'delimiter', ',');
+          obj.quality = str2double(char(s{6}));
+          switch obj.quality
+            case 0
+              obj.time = str2double(char(s{1}));
+              obj.latitude = NaN;
+              obj.longitude = NaN;
+            case {1,2}
+              obj.time = str2double(char(s{1}));
+              obj.latitude = str2double(us191.gps.degMinToDec(char(s{2}), char(s{3})));
+              obj.longitude = str2double(us191.gps.degMinToDec(char(s{4}), char(s{5})));
+
+            otherwise
+              warning('MATLAB:gps:invalid GGA sentence, quality indicator is %d', obj.quality);
           end
       end
     end % end of function handleEvnt
