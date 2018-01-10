@@ -146,7 +146,7 @@ classdef serial < handle
     
     % prototype of function that was in private directory
     % ------------------------------------------------
-    getAvailableComPort();
+    list = getAvailableComPort();
     
     % Discover returns a list of all serial ports on a system.
     function list = Discover()
