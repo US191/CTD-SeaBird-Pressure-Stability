@@ -32,7 +32,7 @@ classdef serial < handle
       if( isa(varargin{1}, 'char'))
         % add test for a valid port with regexp,
         % eg COMx under windows, /dev/ttyS* for Linux
-        obj.port = varargin{1};
+        obj.setPort(varargin{1});
       else
         error('us191:serial', '%s is an invalid serial port ', varargin{1});
       end
