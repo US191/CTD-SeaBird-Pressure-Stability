@@ -45,5 +45,4 @@ for i=1:numel(lIndexDot)+1
   end
 end
 
-lCOM_Port = cellstr(lCOM_Port)';
 end
