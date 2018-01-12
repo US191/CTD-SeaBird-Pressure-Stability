@@ -1,0 +1,54 @@
+classdef test_serial_gps < matlab.unittest.TestCase
+    %UNTITLED Summary of this class goes here
+    %   Each method tests parameters of serial port
+    
+    
+    % Properties definition
+    properties
+        port_test = 'COM7';
+        baudrate_test = 9400;
+    end
+    
+    % Class public methods
+    methods
+        
+        % Constructor
+        function obj = get(valuebaudrate, valueport)
+            
+            obj.valuebaudrate = valuebaudrate;
+            obj.valueport = valueport;
+            
+        end
+        
+        % Test Baudrate
+        function get_baudrate(obj)
+            s = us191.serial(obj.baudrate_Test);
+            s.setBaudrate(obj.baudrate);
+            obj.Valuebaudrate = s.getport;
+        end
+        
+        % Test Baudrate
+        function get_port(obj)
+            s = us191.serial(obj.port_Test);
+            s.setport(obj.port);
+            obj.Valueport = s.getport;
+            
+        end
+        
+    end
+    
+    % Method for Tests
+    
+    methods (Test)
+        function test(testCase)
+            verifyEqual(testCase, testCase.baudrate_test, testCase.ValueBaud);
+            verifySubstring(testCase, testCase.ValuePort, testCase.Port_Test);
+            %             testCase.verifyClass(testCase.Port_Test,'char')
+        end
+        
+        
+    end
+    
+end
+
+
