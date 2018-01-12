@@ -120,10 +120,12 @@ Under Linux, you must specify Java Startup Options to see serial port with Matla
 
 Create the file java.opts under /usr/local/MATLAB/R2017b/bin/glnxa64
 
-with the following line following the 'ls /dev/tty*' command.
+with the following line :
 ```bash    
   -Dgnu.io.rxtx.SerialPorts=/dev/ttyS4:/dev/ttyUSB0
 ```    
+Use the 'ls /dev/tty*' command to discover the new serail port.
+
 Add the user to dialer group and change /dev/ttyUSB0 permission to 777
 
 
@@ -143,5 +145,5 @@ ans =
 ```    
 
 
- _Autor: Pierre Rousselot_Jacques Grelet
- _Date: 05-2016_01-2017
+ Autor: Pierre Rousselot - Jacques Grelet - Morganne Domenge
+ Date: 05-2016_01-2017
