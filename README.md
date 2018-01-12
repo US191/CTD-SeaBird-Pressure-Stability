@@ -85,7 +85,7 @@ Recu: $GPRMC,091514.553,A,4821.5729,N,00433.5744,W,0.54,329.36,120118,,,A*70
 Recu: $GPGGA,091515.553,4821.5725,N,00433.5744,W,1,06,2.8,81.0,M,52.2,M,,0000*78
 >> s.close
 ```    
-### Inherited class gps
+### Inherited class us191.gps
 
 This class defined a listener as:
 ```matlab
