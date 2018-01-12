@@ -68,7 +68,7 @@ Discover             getAvailableComPort
 
 Methods of us191.serial inherited from handle.
 ```    
-Open the serial port, status must be 'open'. The serial port class use an event 'sentenceAvailable' to notify when a valid sentence terminated with 'Terminator' character(s) was received, eg 'CR/LF' for a GPS NMEA183.
+Open the serial port, status must be 'open'. The serial port class trigger an event 'sentenceAvailable' to notify when a valid sentence terminated with 'Terminator' character(s) was received, eg 'CR/LF' for a GPS NMEA183.
 To see the valid sentences, you can set private property 'echo' to 'true' in constructor function or use set.Echo(true) function:
 ```matlab
 s = us191.serial('COM9','baudrate',4800,'terminator','CR/LF','echo',true) 
@@ -92,8 +92,10 @@ This class defined a listener as:
 ```matlab
  obj.listenerHandle = addlistener(obj,'sentenceAvailable',@obj.handleEvnt)
 ```    
-This listener wait for the notification ''sentenceAvailable' that notify a valid sentence was receive and the handleEvnt function decode NMEA sentence and save data in private properties.
+This listener wait for the notification ''sentenceAvailable' which notify that a valid sentence was received and the handleEvnt() function decode NMEA sentence and save data (time, latitude, longitude and GPS quality indicator) in private properties.
 The read function display the last available data and call open function if the serail port was 'closed'.
+See Matlab documentation Events and Listeners Syntax:
+https://fr.mathworks.com/help/matlab/matlab_oop/events-and-listeners-syntax-and-techniques.html#brb6i6i
 
 ```matlab
 >> s=us191.gps('COM9')
@@ -146,4 +148,5 @@ ans =
 
 
  Autor: Pierre Rousselot - Jacques Grelet - Morganne Domenge
+
  Date: 05-2016_01-2017
