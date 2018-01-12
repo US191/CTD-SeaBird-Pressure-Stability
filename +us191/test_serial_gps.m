@@ -13,30 +13,31 @@ classdef test_serial_gps < matlab.unittest.TestCase
     methods
         
         % Constructor
-        function obj = get(valuebaudrate, valueport)
-            
+        function obj = value(valuebaudrate, valueport)
             obj.valuebaudrate = valuebaudrate;
             obj.valueport = valueport;
-           
-            
+            obj = us191.serial(obj.port);
         end
+        
     end
     
     % Method for Tests
-    
     methods (Test)
-        % Test Baudrate
-        function test_baudrate(obj)
-            obj = us191.serial(obj.port);
-            obj.setBaudRate(obj.baudRate);
-            obj.valuebaudrate = obj.getBaudRate;
-            verifyEqual(testCase, testCase.baudrate, testCase.valuebaudrate);
+        
+        function set(obj)
+            obj.setBaudRate(obj.baudrate);
         end
         
-        % Test Baudrate
-        function test_port(obj)
-             obj = us191.serial(obj.port);
+        function setup(obj)
+            obj.valuebaudrate = obj.getBaudRate;
             obj.valueport = obj.getPort;
+            
+        end
+        
+        %Test all parameters
+        function test(testCase)
+            
+            verifyEqual(testCase, testCase.baudrate, testCase.valuebaudrate);
             verifySubstring(testCase, testCase.port, testCase.valueport);
             %testCase.verifyClass(testCase.Port_Test,'char')
             

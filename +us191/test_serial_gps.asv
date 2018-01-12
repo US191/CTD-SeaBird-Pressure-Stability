@@ -5,47 +5,42 @@ classdef test_serial_gps < matlab.unittest.TestCase
     
     % Properties definition
     properties
-        port_test = 'COM7';
-        baudrate_test = 9400;
+        port = 'COM7';
+        baudrate = 4800;
     end
     
     % Class public methods
     methods
         
         % Constructor
-        function obj = get(valuebaudrate, valueport)
-            
+        function obj = value(valuebaudrate, valueport)
             obj.valuebaudrate = valuebaudrate;
             obj.valueport = valueport;
-            
-        end
-        
-        % Test Baudrate
-        function get_baudrate(obj)
-            s = us191.serial(obj.baudrate_Test);
-            s.setBaudrate(obj.baudrate);
-            obj.Valuebaudrate = s.getport;
-        end
-        
-        % Test Baudrate
-        function get_port(obj)
-            s = us191.serial(obj.port_Test);
-            s.setport(obj.port);
-            obj.Valueport = s.getport;
-            
+            obj = us191.serial(obj.port);
         end
         
     end
     
     % Method for Tests
-    
     methods (Test)
-        function test(testCase)
-            verifyEqual(testCase, testCase.baudrate_test, testCase.ValueBaud);
-            verifySubstring(testCase, testCase.ValuePort, testCase.Port_Test);
-            %             testCase.verifyClass(testCase.Port_Test,'char')
+        
+        function set(obj)
+            obj.setBaudRate(obj.baudrate);
         end
         
+        function get(testCase)
+            testCase.valuebaudrate = obj.getBaudRate;
+            testCase.valueport = obj.getPort;
+        end
+        
+        %Test all parameters
+        function test(testCase)
+            
+            verifyEqual(testCase, testCase.baudrate, testCase.valuebaudrate);
+            verifySubstring(testCase, testCase.port, testCase.valueport);
+            %testCase.verifyClass(testCase.Port_Test,'char')
+            
+        end
         
     end
     
