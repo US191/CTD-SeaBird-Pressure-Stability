@@ -41,6 +41,7 @@ s =
   Status:     'not connected'
   Echo:       'false'
 
+>> s.open
 s = 
 
   Port:       'COM9'
@@ -72,7 +73,6 @@ Open the serial port, status must be 'open'. The serial port class trigger an ev
 To see the valid sentences, you can set private property 'echo' to 'true' in constructor function or use set.Echo(true) function:
 ```matlab
 s = us191.serial('COM9','baudrate',4800,'terminator','CR/LF','echo',true) 
->> s.open
 >> s.open
 Recu: $GPGGA,091512.553,4821.5783,N,00433.5824,W,1,06,2.8,70.1,M,52.2,M,,0000*75
 Recu: $GPGSA,A,3,03,07,22,23,09,17,,,,,,,3.7,2.8,2.5*31
