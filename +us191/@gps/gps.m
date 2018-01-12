@@ -1,6 +1,51 @@
 classdef gps < us191.serial
-  %Gps receive and print GPS data from serial RS232 line
-  %   Detailed explanation goes here
+  %US191.GPS receive, decode and display GGA sentence from NMEA-183 serial RS232 line
+  %
+  % example:
+  %
+  %  >> us191.gps.Discover
+  %  >> s = us191.gps.Discover
+  %
+  % >> s =
+  %
+  %   4×1 cell array
+  %
+  %     'COM3'
+  %     'COM9'
+  %     'COM11'
+  %     'COM12'
+  %
+  % >> s = us191.gps('COM9')
+  %
+  % >> s =
+  %
+  %   Port:       'COM9'
+  %   BaudRate:   4800
+  %   DataBits:   8
+  %   StopBits:   1
+  %   Parity:     'none'
+  %   Terminator: 'CR/LF'
+  %   Status:     'not connected'
+  %   Echo:       'false'
+  %
+  % >> s.open
+  % s =
+  %
+  %   Port:       'COM9'
+  %   BaudRate:   4800
+  %   DataBits:   8
+  %   StopBits:   1
+  %   Parity:     'none'
+  %   Terminator: 'CR/LF'
+  %   Status:     'open'
+  %   Echo:       'false'
+  %
+  % >> s.read
+  % Time: 131138 Latitude: 48.35980 Longitude:  -4.55980
+  % >> s.read
+  % Time: 131249 Latitude: 48.35981 Longitude:  -4.55975
+  %
+  % >> s.close
   
   properties (Access = private)
     time
@@ -25,7 +70,7 @@ classdef gps < us191.serial
         pause(1)  % wait for one second
       end
       if ~isempty(obj.sentence)
-        fprintf(1, 'Time: %6.0f Lat: %8.5f Long: %9.5f\n', obj.time,obj.latitude, obj.longitude);
+        fprintf(1, 'Time: %6.0f Latitude: %8.5f Longitude: %9.5f\n', obj.time,obj.latitude, obj.longitude);
       end
     end
     
@@ -45,7 +90,7 @@ classdef gps < us191.serial
               obj.time = str2double(char(s{1}));
               obj.latitude = str2double(us191.gps.degMinToDec(char(s{2}), char(s{3})));
               obj.longitude = str2double(us191.gps.degMinToDec(char(s{4}), char(s{5})));
-
+              
             otherwise
               warning('MATLAB:gps:invalid GGA sentence, quality indicator is %d', obj.quality);
           end

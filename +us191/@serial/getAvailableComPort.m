@@ -3,33 +3,34 @@ function lCOM_Port = getAvailableComPort()
 % Return a Cell Array of COM port names available on your computer
 
 try
-  s=serial('IMPOSSIBLE_NAME_ON_PORT');fopen(s);
-catch
-  lErrMsg = lasterr;
+  s = serial('IMPOSSIBLE_NAME_ON_PORT');fopen(s);
+catch ME
+  lErrMsg =  ME.message;
 end
 
 %Start of the COM available port
-lIndex1 = findstr(lErrMsg,'COM');
+lIndex1 = strfind(lErrMsg,'COM');
 %End of COM available port
-lIndex2 = findstr(lErrMsg,'Use')-3;
+lIndex2 = strfind(lErrMsg,'Use')-3;
 
 lComStr = lErrMsg(lIndex1:lIndex2);
 
 %Parse the resulting string
-lIndexDot = findstr(lComStr,',');
+lIndexDot = strfind(lComStr,',');
 
 % If no Port are available
 if isempty(lIndex1)
-  lCOM_Port{1}='';
+  lCOM_Port{1} = '';
   return;
 end
 
 % If only one Port is available
 if isempty(lIndexDot)
-  lCOM_Port{1}=lComStr;
+  lCOM_Port{1} = lComStr;
   return;
 end
 
+lCOM_Port = cell(length(lIndexDot),1);
 lCOM_Port{1} = lComStr(1:lIndexDot(1)-1);
 
 for i=1:numel(lIndexDot)+1
