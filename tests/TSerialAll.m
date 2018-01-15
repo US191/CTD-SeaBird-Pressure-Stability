@@ -70,17 +70,17 @@ classdef TSerialAll < matlab.unittest.TestCase
             status = {'not connected','open'};
             str = string(status);
             obj.sp = us191.serial(obj.defaultPortOnHost);
-            for s = str(1,1)'
+            for s = str(1,1)
                 stat = char(s);
                 obj.verifyEqual(obj.sp.getStatus, stat);
             end
-            for s = str(1,2)'
+            for s = str(1,2)
                 stat = char(s);
                 obj.sp.open
                 obj.verifyEqual(obj.sp.getStatus, stat);
             end
             
-            for s = str(1,1)'
+            for s = str(1,1)
                 stat = char(s);
                 obj.sp.close
                 obj.verifyEqual(obj.sp.getStatus, stat);
@@ -89,10 +89,10 @@ classdef TSerialAll < matlab.unittest.TestCase
         
         % Test Parity available
         function testParity(obj)
-            parity = {'none','odd','even'};
+            parity = {'none', 'odd', 'even'};
             str = string(parity);
             obj.sp = us191.serial(obj.defaultPortOnHost);
-            for p = str(1:1)'
+            for p = str(1,2)
                 obj.sp.setParity(p);
                 obj.verifyEqual(obj.sp.getParity, p);
             end
@@ -100,13 +100,21 @@ classdef TSerialAll < matlab.unittest.TestCase
         
         % Test Terminator available
         function testTerminator(obj)
-            terminator = {'CR/LF','CR','LF'};
+            terminator = {'CR/LF', 'CR', 'LF'};
             str = string(terminator);
             obj.sp = us191.serial(obj.defaultPortOnHost);
-            for t = str(1:1)'
+            for t = str(1,1)
                 obj.sp.setTerminator(t);
                 obj.verifyEqual(obj.sp.getTerminator, t);
             end
+        end
+        
+        % Test Error Databits available
+        function testError_Databits(obj)
+            obj.sp = us191.serial(obj.defaultPortOnHost);
+
+            obj.verifyError(obj.sp.setDataBits(9),'MATLAB:gps:invalid data bit value: 9')
+            
         end
         
     end
