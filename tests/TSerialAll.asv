@@ -87,26 +87,17 @@ classdef TSerialAll < matlab.unittest.TestCase
             end
         end
         
-        % Test Parity available
+        % Test Parityavailable
         function testParity(obj)
             parity = {'none','odd','even'};
             str = string(parity);
             obj.sp = us191.serial(obj.defaultPortOnHost);
-            for p = str(1:1)'
-                obj.sp.setParity(p);
+            for par = str(1,1)'
+                p = char(par);
+                obj.sp.setparity(sb);
                 obj.verifyEqual(obj.sp.getParity, p);
             end
-        end
-        
-        % Test Terminator available
-        function testTerminator(obj)
-            terminator = {'CR/LF','CR','LF'};
-            str = string(terminator);
-            obj.sp = us191.serial(obj.defaultPortOnHost);
-            for t = str(1:1)'
-                obj.sp.setTerminator(t);
-                obj.verifyEqual(obj.sp.getTerminator, t);
-            end
+
         end
         
     end
