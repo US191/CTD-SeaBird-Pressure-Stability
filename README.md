@@ -21,7 +21,6 @@
 >> us191.serial.Discover
 
 ans =
-
   4×1 cell array
 
     {'COM3' }
@@ -29,8 +28,8 @@ ans =
     {'COM11'}
     {'COM12'}
 
-s = us191.serial('COM9','baudrate',4800,'terminator','CR/LF') 
-s = 
+>> s = us191.serial('COM9','baudrate',4800,'terminator','CR/LF') 
+>> s = 
 
   Port:       'COM9'
   BaudRate:   4800
@@ -42,7 +41,7 @@ s =
   Echo:       'false'
 
 >> s.open
-s = 
+>> s = 
 
   Port:       'COM9'
   BaudRate:   4800
@@ -70,9 +69,9 @@ Discover             getAvailableComPort
 Methods of us191.serial inherited from handle.
 ```    
 Open the serial port, status must be 'open'. The serial port class trigger an event 'sentenceAvailable' to notify when a valid sentence terminated with 'Terminator' character(s) was received, eg 'CR/LF' for a GPS NMEA183.
-To see the valid sentences, you can set private property 'echo' to 'true' in constructor function or use set.Echo(true) function:
+To see the valid sentences, you can set private property 'echo' to 'true' in constructor function or use setEcho(true) function:
 ```matlab
-s = us191.serial('COM9','baudrate',4800,'terminator','CR/LF','echo',true) 
+>> s = us191.serial('COM9','baudrate',4800,'terminator','CR/LF','echo',true) 
 >> s.open
 Recu: $GPGGA,091512.553,4821.5783,N,00433.5824,W,1,06,2.8,70.1,M,52.2,M,,0000*75
 Recu: $GPGSA,A,3,03,07,22,23,09,17,,,,,,,3.7,2.8,2.5*31
@@ -86,21 +85,20 @@ Recu: $GPRMC,091514.553,A,4821.5729,N,00433.5744,W,0.54,329.36,120118,,,A*70
 Recu: $GPGGA,091515.553,4821.5725,N,00433.5744,W,1,06,2.8,81.0,M,52.2,M,,0000*78
 >> s.close
 ```    
-### Inherited class gps
+### Inherited class us191.gps
 
 This class defined a listener as:
 ```matlab
  obj.listenerHandle = addlistener(obj,'sentenceAvailable',@obj.handleEvnt)
 ```    
 This listener wait for the notification ''sentenceAvailable' which notify that a valid sentence was received and the handleEvnt() function decode NMEA sentence and save data (time, latitude, longitude and GPS quality indicator) in private properties.
-The read function display the last available data and call open function if the serail port was 'closed'.
-See Matlab documentation Events and Listeners Syntax:
+The read() function display the last available data and call open() function if the serial port status is closed.
+See Matlab documentation "Events and Listeners Syntax":
 https://fr.mathworks.com/help/matlab/matlab_oop/events-and-listeners-syntax-and-techniques.html#brb6i6i
-
 ```matlab
->> s=us191.gps('COM9')
 
-s = 
+>> s = us191.gps('COM9')
+>> s = 
 
   Port:       'COM9'
   BaudRate:   4800
