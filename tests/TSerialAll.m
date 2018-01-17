@@ -94,15 +94,12 @@ classdef TSerialAll < matlab.unittest.TestCase
     % Test Terminator available
     function testTerminator(obj)
       terminator = {'CR/LF', 'CR', 'LF'};
-      str = string(terminator);
       obj.sp = us191.serial(obj.defaultPortOnHost);
-      for t = str(1,1)
-        obj.sp.setTerminator(t);
-        obj.verifyEqual(obj.sp.getTerminator, t);
+      for t = terminator
+        obj.sp.setTerminator(char(t));
+        obj.verifyEqual(obj.sp.getTerminator, char(t));
       end
     end
-    
-    
     
   end
   
