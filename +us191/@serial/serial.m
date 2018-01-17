@@ -53,10 +53,10 @@ classdef serial < handle
   % Discover             getAvailableComPort
   %
   % Methods of us191.serial inherited from handle.
-  % 
+  %
   % Open the serial port, status must be 'open'. The serial port class trigger an event 'sentenceAvailable' to notify when a valid sentence terminated with 'Terminator' character(s) was received, eg 'CR/LF' for a GPS NMEA183.
   % To see the valid sentences, you can set private property 'echo' to 'true' in constructor function or use set.Echo(true) function:
-  % 
+  %
   % >> s = us191.serial('COM9','baudrate',4800,'terminator','CR/LF','echo',true)
   % >> s.open
   % Receive: $GPGGA,091512.553,4821.5783,N,00433.5824,W,1,06,2.8,70.1,M,52.2,M,,0000*75
@@ -71,19 +71,25 @@ classdef serial < handle
   % Receive: $GPGGA,091515.553,4821.5725,N,00433.5744,W,1,06,2.8,81.0,M,52.2,M,,0000*78
   % >> s.close
   %
-  % ### Inherited class gps
+  % ### Inherited class
   %
-  % This class defined a listener as:
-  % 
-  %  obj.listenerHandle = addlistener(obj,'sentenceAvailable',@obj.handleEvnt)
-  % ```
+  % This inherited class must define a listener as:
+  %
+  %   classdef gps < us191.serial
+  %       methods  % public
+  %     function obj = gps(varargin)
+  %       obj@us191.serial(varargin{:});
+  %       obj.listenerHandle = addlistener(obj,'sentenceAvailable',@obj.handleEvnt);
+  %     end
+  %     ...
+  %
   % This listener wait for the notification ''sentenceAvailable' which notify that a valid sentence was received and the handleEvnt() function decode NMEA sentence and save data (time, latitude, longitude and GPS quality indicator) in private properties.
   % The read function display the last available data and call open function if the serail port was 'closed'.
   % See Matlab documentation Events and Listeners Syntax:
   % https://fr.mathworks.com/help/matlab/matlab_oop/events-and-listeners-syntax-and-techniques.html#brb6i6i
   %
-  % 
-  % >> s=us191.gps('COM9')
+  %
+  % >> s = us191.gps('COM9')
   %
   % s =
   %
@@ -107,7 +113,7 @@ classdef serial < handle
   % Create the file java.opts under /usr/local/MATLAB/R2017b/bin/glnxa64
   %
   % with the following line :
-  % 
+  %
   %   -Dgnu.io.rxtx.SerialPorts=/dev/ttyS4:/dev/ttyUSB0
   %
   % Use the 'ls /dev/tty*' command to discover the new serail port.
@@ -123,7 +129,7 @@ classdef serial < handle
   %     {'/dev/ttyS4'  }
   %     {'/dev/ttyUSB0'}
   %
-  % >> s=us191.gps('/dev/ttyUSB0','baudrate',4800,'terminator','CR/LF')
+  % >> s = us191.serial('/dev/ttyUSB0','baudrate',4800,'terminator','CR/LF')
   % ...
   
   properties (Access = private)
@@ -223,7 +229,7 @@ classdef serial < handle
         case {300,600,1200,2400,4800,9600,19200,57600,112000}
           obj.baudRate = baudRate;
         otherwise
-          error('MATLAB:gps:invalid baud rate value: %d', baudRate);
+          error('MATLAB:serial:invalid baud rate value: %d', baudRate);
       end
     end
     
@@ -237,7 +243,7 @@ classdef serial < handle
         case {7,8}
           obj.dataBits = dataBits;
         otherwise
-          error('MATLAB:gps:invalid data bit value: %d', dataBits);
+          error('MATLAB:serial:invalid data bit value: %d', dataBits);
       end
     end
     
@@ -254,7 +260,7 @@ classdef serial < handle
           if isnumeric(parity)
             parity = num2str(parity);
           end
-          error('MATLAB:gps:invalid parity: %s', parity);
+          error('MATLAB:serial:invalid parity: %s', parity);
       end
     end
     
@@ -268,7 +274,7 @@ classdef serial < handle
         case {1,2}
           obj.stopBits = stopBits;
         otherwise
-          error('MATLAB:gps:invalid stop bit value: %d', stopBits);
+          error('MATLAB:serial:invalid stop bit value: %d', stopBits);
       end
     end
     
@@ -282,7 +288,7 @@ classdef serial < handle
         case {'CR/LF','CR','LF'}
           obj.terminator = terminator;
         otherwise
-          error('MATLAB:gps:invalid terminator character, value : %s', terminator);
+          error('MATLAB:serial:invalid terminator character, value : %s', terminator);
       end
     end
     
@@ -295,7 +301,7 @@ classdef serial < handle
       if islogical(echo)
         obj.echo = echo;
       else
-        error('MATLAB:gps:invalid echo mode, value : %s', echo);
+        error('MATLAB:serial:invalid echo mode, value : %s', echo);
       end
     end
     
