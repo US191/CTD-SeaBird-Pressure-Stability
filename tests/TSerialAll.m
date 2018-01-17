@@ -7,7 +7,7 @@ classdef TSerialAll < matlab.unittest.TestCase
   properties
     ports
     sp
-    defaultPortOnHost = 'COM16'
+    defaultPortOnHost = 'COM9'
   end
   
   % Each method in that block is identified as a method responsible for setting
@@ -67,34 +67,27 @@ classdef TSerialAll < matlab.unittest.TestCase
     
     % Test Status available
     function testStatus(obj)
-      status = {'not connected','open'};
-      str = string(status);
+      status = {'open', 'not connected'};
       obj.sp = us191.serial(obj.defaultPortOnHost);
-      for s = str(1,1)
-        stat = char(s);
-        obj.verifyEqual(obj.sp.getStatus, stat);
-      end
-      for s = str(1,2)
-        stat = char(s);
-        obj.sp.open
-        obj.verifyEqual(obj.sp.getStatus, stat);
-      end
-      
-      for s = str(1,1)
-        stat = char(s);
-        obj.sp.close
-        obj.verifyEqual(obj.sp.getStatus, stat);
+      for s = status
+        switch char(s)
+          case 'open'
+            obj.sp.open;
+            obj.verifyEqual(obj.sp.getStatus, char(s));
+             obj.sp.close;
+          case 'not connected'
+            obj.verifyEqual(obj.sp.getStatus, char(s));
+        end
       end
     end
     
     % Test Parity available
     function testParity(obj)
       parity = {'none', 'odd', 'even'};
-      str = string(parity);
       obj.sp = us191.serial(obj.defaultPortOnHost);
-      for p = str(1,2)
-        obj.sp.setParity(p);
-        obj.verifyEqual(obj.sp.getParity, p);
+      for p = parity
+        obj.sp.setParity(char(p));
+        obj.verifyEqual(obj.sp.getParity, char(p));
       end
     end
     
@@ -109,7 +102,7 @@ classdef TSerialAll < matlab.unittest.TestCase
       end
     end
     
-
+    
     
   end
   
