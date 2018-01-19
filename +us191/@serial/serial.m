@@ -229,7 +229,7 @@ classdef serial < handle
         case {300,600,1200,2400,4800,9600,19200,57600,112000}
           obj.baudRate = baudRate;
         otherwise
-          error('MATLAB:serial:invalid baud rate value: %d', baudRate);
+          error('matlab:demo:invalidbaud','MATLAB:demo:invalid baud rate value: %d', baudRate);
       end
     end
     
@@ -243,7 +243,7 @@ classdef serial < handle
         case {7,8}
           obj.dataBits = dataBits;
         otherwise
-          error('MATLAB:serial:invalid data bit value: %d', dataBits);
+          error('matlab:demo:invalidDataBits','MATLAB:serial:invalid data bit value: %d', dataBits);
       end
     end
     

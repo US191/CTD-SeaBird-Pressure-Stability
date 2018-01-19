@@ -7,7 +7,7 @@ classdef TSerialErrorAll < matlab.unittest.TestCase
   properties
     ports
     sp
-    defaultPortOnHost = 'COM16'
+    defaultPortOnHost = 'COM9'
   end
   
   % Each method in that block is identified as a method responsible for setting
@@ -28,9 +28,12 @@ classdef TSerialErrorAll < matlab.unittest.TestCase
     % Test Error Databits available
     function testErrorDatabits(obj)
       dataBits = 9;
-      obj.verifyError(@() us191.serial(obj.defaultPortOnHost, 'DataBits',dataBits),...
-        sprintf('MATLAB:serial:invalid data bit value: %d', dataBits));
-      
+      % test with setter
+      s = us191.serial(obj.defaultPortOnHost);
+      obj.verifyError(@() s.setDataBits(dataBits),'matlab:demo:invalidDataBits');
+      % test from constructor
+      obj.verifyError(@()  us191.serial(obj.defaultPortOnHost,'databits' ,dataBits),...
+       'matlab:demo:invalidDataBits');
     end
   end
 end
