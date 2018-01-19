@@ -229,7 +229,7 @@ classdef serial < handle
         case {300,600,1200,2400,4800,9600,19200,57600,112000}
           obj.baudRate = baudRate;
         otherwise
-          error('matlab:demo:invalidbaud','MATLAB:demo:invalid baud rate value: %d', baudRate);
+          error('matlab:serial:invalidBaudRate','MATLAB:demo:invalid baud rate value: %d', baudRate);
       end
     end
     
@@ -243,7 +243,7 @@ classdef serial < handle
         case {7,8}
           obj.dataBits = dataBits;
         otherwise
-          error('matlab:demo:invalidDataBits','MATLAB:serial:invalid data bit value: %d', dataBits);
+          error('matlab:serial:invalidDataBits','MATLAB:serial:invalid data bit value: %d', dataBits);
       end
     end
     
@@ -260,7 +260,7 @@ classdef serial < handle
           if isnumeric(parity)
             parity = num2str(parity);
           end
-          error('MATLAB:serial:invalid parity: %s', parity);
+          error('matlab:serial:invalidParity','MATLAB:serial:invalid parity: %s', parity);
       end
     end
     
@@ -274,7 +274,7 @@ classdef serial < handle
         case {1,2}
           obj.stopBits = stopBits;
         otherwise
-          error('MATLAB:serial:invalid stop bit value: %d', stopBits);
+          error('matlab:serial:invalidStopBits','MATLAB:serial:invalid stop bit value: %d', stopBits);
       end
     end
     
@@ -288,7 +288,7 @@ classdef serial < handle
         case {'CR/LF','CR','LF'}
           obj.terminator = terminator;
         otherwise
-          error('MATLAB:serial:invalid terminator character, value : %s', terminator);
+          error('matlab:serial:invalidTerminator','MATLAB:serial:invalid terminator character, value : %s', terminator);
       end
     end
     
@@ -301,7 +301,7 @@ classdef serial < handle
       if islogical(echo)
         obj.echo = echo;
       else
-        error('MATLAB:serial:invalid echo mode, value : %s', echo);
+        error('matlab:serial:invalidEcho','MATLAB:serial:invalid echo mode, value : %s', echo);
       end
     end
     
