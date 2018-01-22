@@ -31,25 +31,26 @@ classdef trame < handle
                 
                 
 %Calcul Pressure temperature compensation
-                bin_byte30 = dec2bin(data(64),8);   %Convert hexa number to bin number
-                bin_byte31 = dec2bin(data(65),8);
+                bin_byte30_1 = dec2bin(data(62),4);   %Convert hexa number to bin number
+                bin_byte30_2 = dec2bin(data(63),4);
+                bin_byte31_1 = dec2bin(data(64),4);
                 
-                bit30 = num2cell(bin_byte30);       %Bit in each cell
-                bit31 = num2cell(bin_byte31);
+                bit30_1 = num2cell(bin_byte30_1);     %Bit in each cell
+                bit30_2 = num2cell(bin_byte30_2);
+                bit31_1 = num2cell(bin_byte31_1);
+                %disp(bit31_1)
                 
                 %Calcul N  : byte of 12 bits
-                N = [bit30, bit31(1), bit31(2), bit31(3), bit31(4)];
+                N = [bit30_1, bit30_2, bit31_1];
                 N_bin = strjoin(N);     %Recover 12 bits
                 N_dec = bin2dec(N_bin); %Convert bin number to dec number
-                %disp(N_dec)
+                disp(N_dec)
                 
                 %Coeff Pressure temperature compensation
                 M = 0.01258;
                 B = -9.844;
                 Td = (M*N_dec)-B;
                 %disp(Td)
-                
-                
                 
 % Calcul Pressure with coeff 
                 
@@ -71,7 +72,7 @@ classdef trame < handle
                 T = 1/f_pressure;
                 To = T1 + T2*Td + T3*Td^2 + T4*Td^3 + T5*Td^4;
                 P = C*(1-(To^2/T^2))*(1-D*(1-(To^2/T^2)));
-                disp(P)     
+%                 disp(P)     
             end
             
             %Close file
