@@ -31,7 +31,7 @@ classdef Tmeasures < handle
         end
         
 %         %
-%         function calcul_data
+%         function calcul_Pressure and temperature compensation
 %             
 %             %Pressure temperature compensation
 %             Td = (s(15).coeff*N_dec)-s(16).coeff;
@@ -44,15 +44,10 @@ classdef Tmeasures < handle
 %                 s(11).coeff*Td^3 + s(14).coeff*Td^4;
 %             
 %             Pressure = C*(1-(To^2/T^2))*(1-D*(1-(To^2/T^2)));
-%             
-%             
-%             
+   
 %         end
         
-%         function stat
-%             
-%             
-%         end
+
         
     end
 end
