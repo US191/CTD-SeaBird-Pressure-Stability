@@ -1,5 +1,5 @@
 
-classdef Tmeasures < handle
+classdef Readfilexml < handle
     
     %     properties
     

@@ -42,17 +42,14 @@ classdef decode < handle
                 obj.extractpar(trame),obj.extractp_t(trame),...
                 obj.extractcount(trame)};
                        
-            structure = struct('datas',datas, 'f_decode', funct);
+            structure = struct('datas', datas, 'f_decode', funct);
             
             for i = 1:5
                  structure(i).datas = structure(i).f_decode;
-                 fprintf(fID,'%f\t%f\t%f\t%f\t%f\n',...
-                     structure(1).datas,structure(2).datas,...
-                     structure(3).datas, structure(4).datas,...
-                     structure(5).datas);
+                 fprintf(fID,'%f\n',structure(i).datas);
             end
             
-            
+%             disp(structure(1).datas );
             fclose(fID);
             
         end
@@ -65,7 +62,9 @@ classdef decode < handle
             for i = 1:1:obj.nFreq
                 frequencies(i) = obj.decodef(p, trame);
                 p = p + obj.sizeFreq;
+                
             end
+            
         end 
         
         function voltages = extractv(obj, trame)
