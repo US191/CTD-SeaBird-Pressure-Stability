@@ -20,6 +20,7 @@ classdef decode < handle
         
         % constructor
         function obj = Decode(varargin)
+           
             obj.nFreq = varargin{1};
             obj.nVolt = varargin{2};
             if (nargin > 2 )
@@ -28,6 +29,31 @@ classdef decode < handle
                     obj.sizePar = varargin{5};
                     obj.sizeCount = varargin{6};
             end
+            
+        end
+        
+        function save(obj, trame)
+            
+            fID = fopen('datas.txt','w');
+            
+            datas = {'frequencies','voltages','par','p_t','count'};
+            
+            funct = {obj.extractf(trame), obj.extractv(trame),...
+                obj.extractpar(trame),obj.extractp_t(trame),...
+                obj.extractcount(trame)};
+                       
+            structure = struct('datas',datas, 'f_decode', funct);
+            
+            for i = 1:5
+                 structure(i).datas = structure(i).f_decode;
+                 fprintf(fID,'%f\t%f\t%f\t%f\t%f\n',...
+                     structure(1).datas,structure(2).datas,...
+                     structure(3).datas, structure(4).datas,...
+                     structure(5).datas);
+            end
+            
+            
+            fclose(fID);
             
         end
         
@@ -68,24 +94,7 @@ classdef decode < handle
             count = obj.decodecount(p, trame);
         end
 
-        % end of extract
-        
-        function save(frequencies,voltage,surface_PAR,Pressure_temp,count)
-            fid = fopen('alldata.txt','w');
-            
-            name = {'freq','volt','PAR','Pressure_t','count'};
-
-            coefficients = {frequencies,voltage,surface_PAR,Pressure_temp,count};
-            
-            s = struct('name_element', name, 'coeff', coefficients);
-            
-            for i = 1:5
-                fprintf(fid,'%f\n',s(i)); 
-            end
-            
-            fclose(fid);
-            
-        end
+        % end of extract      
         
         
     end  % end of public methods
