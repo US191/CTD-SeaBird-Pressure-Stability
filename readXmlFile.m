@@ -1,17 +1,15 @@
 
-function readXmlFile 
+function readXmlFile
 
 properties
 filename
 %Class constructor
-function obj = readXmlFile (varargin)
+    function obj = readXmlFile (varargin)
+        
+        obj.filename = varargin{1};
+        
+    end
 
-obj.filename = varargin{1};
-
-end
-
-%function read
-function readXmlFile(obj)
 
 %Read file xml
 file = xmlread(obj.filename);
@@ -28,8 +26,6 @@ for i = 1:16
     element = file.getElementsByTagName(s(i).name_element);
     s(i).coeff = char(element.item(0).getFirstChild.getData);
     disp(s(i).coeff);
-end
-
 end
 
 end
