@@ -2,7 +2,6 @@ classdef Cal < handle
     %Calcul Pressure and the the temperature compensation
 %Example : 
 %     -Creat a object  : s = Cal
-%     -Read datas and Coefficient file xml and txt : s.readdatafile
 %     -Calcul Pressure and temperature : s.Calcul
 
     properties (Access = private)
@@ -87,6 +86,8 @@ classdef Cal < handle
         %P = C(1-(To^2/T^2)(1-D(1-To^2/T^2))
         
         function Calcul(obj)
+            %Call function read for get coeff and datas
+            obj.readdatafile;
             
             %Pressure temperature compensation Td = (M*N)-B
             Td = (obj.coeff('AD590M')*obj.datas('pt'))-obj.coeff('AD590B');
