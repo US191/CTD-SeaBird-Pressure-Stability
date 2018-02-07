@@ -1,4 +1,26 @@
 classdef decode < handle
+%     Classe for decode a data line and save the datas in file datas.txt
+%     Example : 
+%     Creat a object : s = decode
+%     decode a line and save data : s.save('106B570ACF6883646910BA460A87706DEFFF882FFFFFFFFFFFFFFF000000719241')
+%     File data.txt : 
+%     3180.464844
+% Freqs :       4203.339844
+%               2767.406250
+%               33636.410156
+%               4282.273438
+%               2695.437500
+% Voltages :    2.853480
+%               0.000000
+%               2.340659
+%               0.000000
+%               0.000000
+%               0.000000
+%               0.000000
+%               0.000000
+%par :          0.000000
+%temp_pressure: 1817.000000
+%count :        65.000000
     
     %Number frequencies and number of voltages
     properties
@@ -58,7 +80,6 @@ classdef decode < handle
             
         end
         
-        % example: trame = '106B570ACF6883646910BA460A87706DEFFF882FFFFFFFFFFFFFFF000EEE719241';
         %Function extraction datas from trame
         function frequencies = extractf(obj, trame)
             frequencies = ones(obj.nFreq, 1); 

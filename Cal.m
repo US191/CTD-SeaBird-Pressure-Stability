@@ -1,7 +1,10 @@
 classdef Cal < handle
-    %UNTITLED4 Summary of this class goes here
-    %   Detailed explanation goes here
-    
+    %Calcul Pressure and the the temperature compensation
+%Example : 
+%     -Creat a object  : s = Cal
+%     -Read datas and Coefficient file xml and txt : s.readdatafile
+%     -Calcul Pressure and temperature : s.Calcul
+
     properties (Access = private)
         filenamecoeff
         filenamedata

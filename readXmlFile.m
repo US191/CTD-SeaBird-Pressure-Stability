@@ -1,4 +1,5 @@
 %Function for recover all coefficients of pressure sensor
+%Example : coeff = readFileXml('1263.xml')
 function coeff = readXmlFile(filename)
 
 %Read file xml
