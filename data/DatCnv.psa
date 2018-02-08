@@ -24,7 +24,7 @@
   <ScanRangeDuration value="8.000000" />
   <StartTimeOption value="2" />
   <PromptForNoteAndOrStartTime value="0" />
-  <CalcArray Size="14" >
+  <CalcArray Size="16" >
     <CalcArrayItem index="0" CalcID="72" >
       <Calc UnitID="-1" Ordinal="0" >
         <FullName value="Scan Count" />
@@ -102,6 +102,16 @@
     <CalcArrayItem index="13" CalcID="24" >
       <Calc UnitID="60" Ordinal="0" >
         <FullName value="Fluorescence, Chelsea Aqua 3 Chl Con [ug/l]" />
+      </Calc>
+    </CalcArrayItem>
+    <CalcArrayItem index="14" CalcID="36" >
+      <Calc UnitID="23" Ordinal="2" >
+        <FullName value="Frequency 2" />
+      </Calc>
+    </CalcArrayItem>
+    <CalcArrayItem index="15" CalcID="68" >
+      <Calc UnitID="7" Ordinal="0" >
+        <FullName value="Pressure Temperature [deg C]" />
       </Calc>
     </CalcArrayItem>
   </CalcArray>
