@@ -92,7 +92,7 @@ classdef Cal < handle
             %Pressure temperature compensation Td = (M*N)-B
             Td = (obj.coeff('AD590M')*obj.datas('pt'))-obj.coeff('AD590B');
             
-            disp(Td);
+%             disp(Td);
             
             %Calcul Pressure (psia)
             C = obj.coeff('C1') + obj.coeff('C2')*Td + obj.coeff('C3')*Td^2;
