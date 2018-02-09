@@ -59,7 +59,7 @@ classdef Cal < handle
                     'sec_cond','v1','v2','v3','v4','v5','v6','v7',...
                     'v8','par','pt','count'};
                 
-                for i=1:16
+                for i=1:length(key)
                 value(i) = data(i);
                 end
                 obj.datas = containers.Map(key, value);
@@ -84,7 +84,7 @@ classdef Cal < handle
         %T = pressure period (microsec)
         %P = C(1-(To^2/T^2)(1-D(1-To^2/T^2))
         
-        function Calcul(obj)
+        function pressure = Calcul(obj, freq, tempComp)
             %Call function read for get coeff and datas
             obj.readdatafile;
             
