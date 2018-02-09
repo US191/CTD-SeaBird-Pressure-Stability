@@ -31,13 +31,12 @@ classdef TXmlcon < matlab.unittest.TestCase
     
     % Test port available on host
     function testFile(obj)
-      for i = length(obj.keyMap)
+      for i = 1:length(obj.keyMap)
         theKey = obj.keyMap{i};
         obj.verifyEqual(obj.map(theKey), obj.valueMap{i});
       end
     end
   end
-  
   
 end
 
