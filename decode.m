@@ -43,13 +43,12 @@ classdef decode < handle
         
         % constructor
         function obj = decode(varargin)
-            %Init nuber of voltages and frequencies and namefile
+            %Init number of voltages and frequencies
             obj.nFreq = 5;
             obj.nVolt = 8;
             obj.filename = 'data.txt';
             %Open file
             obj.fID = fopen(obj.filename,'w');
-            
             
         end
         
@@ -59,7 +58,6 @@ classdef decode < handle
             %Structure call all extract function
             datas = {'frequencies','voltages','par','p_t','count'};
 
-            
             funct = {obj.extractFreq(trame),obj.extractVolt(trame) ,...
                 obj.extractPar(trame),obj.extractP_temp(trame),...
                 obj.extractCount(trame)};
@@ -69,8 +67,11 @@ classdef decode < handle
             %writting datas in file
             for i = 1 : 5
                 structure(i).datas = structure(i).f_decode;
-                fprintf(obj.fID,'%f\n',structure(i).datas);
+                
             end
+            fprintf(obj.fID,'%f\n%f\n%f\n%f\n%f\n%f',...
+                structure(1).datas,structure(2).datas, structure(3).datas,...
+                structure(4).datas,structure(5).datas);
             
             %Close file
             fclose(obj.fID);
@@ -88,6 +89,7 @@ classdef decode < handle
                 p = p + obj.sizeFreq;
                 
             end
+            disp(frequencies(3));
             
         end
         
@@ -106,7 +108,7 @@ classdef decode < handle
         end
         
         function Pressure_temp = extractP_temp(obj, trame)
-            p = 4 + obj.sizeFreq * obj.nFreq + obj.sizeVolt * obj.nVolt + ...
+            p = 8 + obj.sizeFreq * obj.nFreq + obj.sizeVolt * obj.nVolt + ...
                 obj.sizePar;
             Pressure_temp = obj.decodeP_temp(p, trame);
         end
@@ -127,8 +129,10 @@ classdef decode < handle
         
         function frequencie = decodeFreq(obj, p, trame)
             bytes = trame(p:p+obj.sizeFreq);
-            frequencies = hex2dec([bytes(1:2);bytes(3:4);bytes(5:6)]);
-            frequencie = frequencies(1)*256 + frequencies(2) + frequencies(3)/256;
+            frequencie = hex2dec([bytes(1:2);bytes(3:4);bytes(5:6)]);
+            frequencie = frequencie(1)*256 + frequencie(2) + frequencie(3)/256;
+%             disp(frequencie);
+
         end
         
         function voltage = decodeVolt(obj, p, trame)
@@ -146,7 +150,7 @@ classdef decode < handle
         function Pressure_t = decodeP_temp(obj, p, trame)
             bytes = trame(p:p+obj.sizeP_t);
             Pressure_t = hex2dec(bytes(1:3));
-            
+%             disp(bytes(1:3));
         end
         
         function Count = decodeCount(obj, p, trame)

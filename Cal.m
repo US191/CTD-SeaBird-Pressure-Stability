@@ -63,9 +63,8 @@ classdef Cal < handle
                 value(i) = data(i);
                 end
                 obj.datas = containers.Map(key, value);
-                %disp(obj.data);
+                
             end
-            
             
             fclose(filedatas);
             %call function : Get coeff file xml 
@@ -90,18 +89,19 @@ classdef Cal < handle
             obj.readdatafile;
             
             %Pressure temperature compensation Td = (M*N)-B
-            Td = (obj.coeff('AD590M')*obj.datas('pt'))-obj.coeff('AD590B');
-            
-%             disp(Td);
+             Td = (obj.coeff('AD590M')*obj.datas('pt'))+obj.coeff('AD590B');
+             
+             disp(Td);
             
             %Calcul Pressure (psia)
-            C = obj.coeff('C1') + obj.coeff('C2')*Td + obj.coeff('C3')*Td^2;
-            D = obj.coeff('D1') + obj.coeff('D2')*Td;
-            T = 1/obj.datas('pres')*10^(6);
-            To = obj.coeff('T1') + obj.coeff('T2')*Td + obj.coeff('T3')*Td^2 + ...
-                obj.coeff('T4')*Td^3 + obj.coeff('T5')*Td^4;
+            C = obj.coeff('C1') + (obj.coeff('C2')*Td) + (obj.coeff('C3')*Td^2);
+            D = obj.coeff('D1') + (obj.coeff('D2')*Td);
+            T = 1/(obj.datas('pres')*10^(-6));
+            To = obj.coeff('T1') + (obj.coeff('T2')*Td) + (obj.coeff('T3')*Td^2) + ...
+                (obj.coeff('T4')*Td^3) + (obj.coeff('T5')*Td^4);
 
-            Pressure = C*(1-(To^2/T^2))*(1-D*(1-(To^2/T^2)));
+            Pressure = C*(1-(To^2/T^2))*(1-(D*(1-(To^2/T^2))));
+            Pressure = Pressure * 0.689475728;
             disp(Pressure);
             
         end
