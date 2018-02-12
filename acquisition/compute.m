@@ -1,4 +1,4 @@
-classdef myCompute < handle
+classdef compute < handle
   
   properties (Access = private)
   end
@@ -10,7 +10,7 @@ classdef myCompute < handle
   methods
     
     % constructor
-    function obj = myCompute(fileXmlcon)
+    function obj = compute(fileXmlcon)
       obj.coeff = readXmlcon(fileXmlcon);
     end % end of constructor
     
@@ -34,7 +34,7 @@ classdef myCompute < handle
     % P = C(1-(To^2/T^2)(1-D(1-To^2/T^2))
     % pressure in decibard
     % P = P / 1.450377;
-    function P = compute(obj, F, Td)
+    function P = computePress(obj, F, Td)
       
       % compute Pressure (psia)
       C = obj.coeff('C1') + obj.coeff('C2') * Td + obj.coeff('C3') * Td^2;

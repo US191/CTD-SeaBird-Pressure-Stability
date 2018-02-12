@@ -1,4 +1,4 @@
-function myTestPress
+function hardCodedTest
 
 % 1263.xml
 C1=-4.023025e+004;
@@ -21,26 +21,23 @@ F = 33096.289;
 N = 2837;
 P = 2.988; % db
 Td = computeTemp(N);
-p = compute(F, Td);
+p = computePress(F, Td);
 fprintf(1, 'Press= %8.3f db,  Expected: %8.3f db, Temp= %5.2f°C\n', p, P, Td);
 %
 F = 33684.457;
 Td = 25.59;
 P = 1000.016; % db
-p = compute(F, Td);
+p = computePress(F, Td);
 fprintf(1, 'Press= %8.3f db,  Expected: %8.3f db, Temp= %5.2f°C\n', p, P, Td);
 %
 F = 34063.273;
 N = 2622;
 P = 1653.143; % db
 Td = computeTemp(N);
-p = compute(F, Td);
+p = computePress(F, Td);
 fprintf(1, 'Press= %8.3f db,  Expected: %8.3f db, Temp= %5.2f°C\n', p, P, Td);
 
-
-
-
-  function P = compute(F, Td)
+  function P = computePress(F, Td)
     % pressure temperature compensation Td = (M * N) + B
     %Td = AD590M * N + AD590B;
     

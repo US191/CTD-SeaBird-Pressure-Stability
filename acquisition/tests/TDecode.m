@@ -21,7 +21,7 @@ classdef TDecode < matlab.unittest.TestCase
     
     % setup intialize an serial instance by default
     function setup(obj)
-      obj.decoder = myDecode();
+      obj.decoder = decode();
     end
   end
   
@@ -33,7 +33,7 @@ classdef TDecode < matlab.unittest.TestCase
     function testFreq(obj)
       for i = 1:length(obj.trame)
         theTrame = obj.trame{i};
-        s = obj.decoder.decode(theTrame);
+        s = obj.decoder.decodeTrame(theTrame);
         obj.verifyEqual(s.frequencies(3), obj.freq{i},'AbsTol',0.001,...
             'Difference between actual and expected exceeds relative tolerance');
         obj.verifyEqual(s.pressureTemperature, obj.rawTemp{i});

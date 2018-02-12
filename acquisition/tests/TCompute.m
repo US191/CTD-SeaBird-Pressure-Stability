@@ -32,12 +32,12 @@ classdef TCompute < matlab.unittest.TestCase
     %
     function testPressure(obj)
       for i = 1:length(obj.trame)
-        md = myDecode();
-        mc = myCompute(obj.fileXmlcon{i});
+        md = decode();
+        mc = compute(obj.fileXmlcon{i});
         theTrame = obj.trame{i};
-        raw = md.decode(theTrame);
+        raw = md.decodeTrame(theTrame);
         t = mc.computeTemp(raw.pressureTemperature);
-        p = mc.compute(raw.frequencies(3), t);
+        p = mc.computePress(raw.frequencies(3), t);
         obj.verifyEqual(p, obj.pressure{i},'RelTol',0.01,...
           'Difference between actual and expected exceeds relative tolerance');
         obj.verifyEqual(t, obj.temp{i},'RelTol',0.01,...
@@ -48,8 +48,8 @@ classdef TCompute < matlab.unittest.TestCase
     function testPressureFromFile(obj)
       fidHex = fopen(obj.hexFile,'r');
       fidCnv = fopen(obj.cnvFile,'r');
-      md = myDecodeFromFile(5,4,0);
-      mc = myCompute(obj.fileXmlcon{2});
+      md = decodeFromFile(5,4,0);
+      mc = compute(obj.fileXmlcon{2});
       while ~feof(fidHex)
         theTrame = fgetl(fidHex);
         theBuf = fgetl(fidCnv);
@@ -57,9 +57,9 @@ classdef TCompute < matlab.unittest.TestCase
         P = theData(3);
         F = theData(15);
         TP = theData(16);
-        raw = md.decode(theTrame);
+        raw = md.decodeTrame(theTrame);
         t = mc.computeTemp(raw.pressureTemperature);
-        p = mc.compute(raw.frequencies(3), t);
+        p = mc.computePress(raw.frequencies(3), t);
         obj.verifyEqual(raw.frequencies(3), F,'RelTol',0.001,...
           'Difference between actual and expected exceeds relative tolerance');
         obj.verifyEqual(t, TP,'RelTol',0.01,...
