@@ -9,7 +9,7 @@ classdef decode < handle
   properties (Access = private)
     sizeFreq = 6   % 3 bytes per freq (24 bit)
     sizeVolt = 3   % 1.5 byte per voltage (12 bit)
-    sizeSPar = 6   % 3 bytes
+    sizeSPar = 0   % 3 bytes
     sizeP_t  = 4   % 1.5 byte + status 0.5
     sizeModulo = 2 % 1 byte
   end

@@ -1,4 +1,4 @@
-classdef ctd < us191.serial
+classdef ctd < us191.serial & decode & compute
   %CTD collect and compute pressure from deck-unit SBE11+ with serial port
   % s = us191.ctd('COM9','baudrate',19200,'terminator','CR/LF')
   % s.open
@@ -30,7 +30,16 @@ classdef ctd < us191.serial
     
     % ctd constructor
     function obj = ctd(varargin)
-      obj@us191.serial(varargin{:});
+      if( isa(varargin{1}, 'char'))
+        % set serial port with first argument, eg COMx
+        fileXmlcon = varargin{1};
+      else
+        error('us191:ctd', '%s is an invalid xml file ', varargin{1});
+      end
+      obj@us191.serial(varargin{2:end});
+      obj@decode(1,0);
+      obj@compute(fileXmlcon);
+      
       obj.listenerHandle = addlistener(obj,'sentenceAvailable',@obj.handleEvnt);
     end
     
@@ -88,8 +97,13 @@ classdef ctd < us191.serial
     
     % call when data available on serial port
     function handleEvnt(obj,~,~)
-      fprintf(1, '%s\n', obj.sentence);
+      fprintf(1, '%s', obj.sentence);
       fprintf(obj.fid, '%s\n', obj.sentence);
+      raw = obj.decodeTrame(obj.sentence);
+      t = obj.computeTemp(raw.pressureTemperature);
+      p = obj.computePress(raw.frequencies, t);
+      fprintf(1, '   Press= %8.3fdb, Temp= %5.2f°C\n', p, t);
+      
     end % end of function handleEvnt
     
     function sendCommand(obj, cmds)
