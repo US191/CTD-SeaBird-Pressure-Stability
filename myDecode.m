@@ -7,13 +7,11 @@ classdef myDecode < handle
   
   %Size all parameters
   properties (Access = private)
-    sizeFreq = 6   % default, 6 bytes per hex freq
-    sizeVolt = 3   % default, 3 bytes per hex volt
-    sizePar = 3    % default, 3 bytes
-    sizeP_t = 3    % default, 3 bytes
-    sizeCount = 2  % default, 2 bytes
-    sizeDummy = 3
-    pointer = 1    
+    sizeFreq = 6   % 3 bytes per freq (24 bit)
+    sizeVolt = 3   % 1.5 byte per voltage (12 bit)
+    sizeSPar = 6   % 3 bytes
+    sizeP_t  = 4   % 1.5 byte + status 0.5
+    sizeModulo = 2 % 1 byte
   end
   
   methods % public
@@ -30,21 +28,32 @@ classdef myDecode < handle
       end
     end
     
-    % example: trame = '12B788195AD281484A13196918C0A5784563BCB1A508C029118B774150234720B153FCD066B458';
-    function s = extract(obj, trame)
+    % example: trame = '106B570ACF6883646910BA460A87706DEFFF882FFFFFFFFFFFFFFF000000719241';
+    function s = decode(obj, trame)
+      pointer = 1;
+      % extract frequencies
       frequencies = ones(obj.nFreq, 1);
       for i = 1:1:obj.nFreq
-        bytes = trame(obj.pointer : obj.pointer + obj.sizeFreq);
-        
-        theFreq = hex2dec([bytes(1),bytes(2);bytes(3),bytes(4);bytes(5),bytes(6)]);
-        frequencies(i) = theFreq(1)*256 + theFreq(2) + theFreq(3)/256;
-        obj.pointer = obj.pointer + obj.sizeFreq;
+        bytes = trame(pointer : pointer + obj.sizeFreq -1);
+        frequencies(i) = hex2dec(bytes(1:2))*256 + hex2dec(bytes(3:4)) + ...
+          hex2dec(bytes(5:6))/256;
+        pointer = pointer + obj.sizeFreq;
       end
       s.frequencies = frequencies;
-      obj.pointer = obj.pointer + (obj.sizeVolt * obj.nVolt) + obj.sizeDummy + obj.sizePar;
-      bytes = trame(obj.pointer : obj.pointer + obj.sizeP_t);
-      s.PressureTemperature = hex2dec(bytes(1:3));
-    end % end of extract
+      
+      % step voltages and SPAR
+      pointer = pointer + (obj.sizeVolt * obj.nVolt) + obj.sizeSPar;
+      
+      % extract Pressure temp included status
+      bytes = trame(pointer : pointer + obj.sizeP_t -1);
+      s.pressureTemperature = hex2dec(bytes(1:2))*16 + hex2dec(bytes(3));
+      pointer = pointer + obj.sizeP_t;
+      
+      % extract modulo
+      bytes = trame(pointer : pointer + obj.sizeModulo -1);
+      s.modulo = hex2dec(bytes);
+      
+    end % end of decode
     
   end  % end of methods
   

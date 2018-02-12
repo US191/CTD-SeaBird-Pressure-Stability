@@ -7,7 +7,7 @@ classdef TSerialAll < matlab.unittest.TestCase
   properties
     ports
     sp
-    defaultPortOnHost = 'COM3'
+    defaultPortOnHost = 'COM9'
   end
   
   % Each method in that block is identified as a method responsible for setting
