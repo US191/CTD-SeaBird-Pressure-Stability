@@ -356,7 +356,7 @@ classdef serial < handle
       
       % diplay methods list in hypertext link
       % -------------------------------------
-      disp('list of <a href="matlab:methods(''us191.serial'')">methods</a>');
+      % disp('list of <a href="matlab:methods(''us191.serial'')">methods</a>');
     end
     
   end % end of public methods
