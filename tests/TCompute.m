@@ -58,12 +58,13 @@ classdef TCompute < matlab.unittest.TestCase
         F = theData(15);
         TP = theData(16);
         raw = decoder.decode(theTrame);
-        [p,tp] = computer.compute(raw.frequencies(3), raw.pressureTemperature);
+        t = mc.computeTemp(raw.pressureTemperature);
+        p = mc.compute(raw.frequencies(3), t);
         obj.verifyEqual(raw.frequencies(3), F,'AbsTol',0.001,...
           'Difference between actual and expected exceeds relative tolerance');
-        % obj.verifyEqual(p, P,'AbsTol',0.001,...
-        %  'Difference between actual and expected exceeds relative tolerance');
-        obj.verifyEqual(tp, TP,'AbsTol',0.01,...
+        obj.verifyEqual(t, TP,'AbsTol',0.01,...
+          'Difference between actual and expected exceeds relative tolerance');
+        obj.verifyEqual(p, P,'AbsTol',0.001,...
           'Difference between actual and expected exceeds relative tolerance');
       end
       
