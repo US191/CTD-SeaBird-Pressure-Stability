@@ -5,7 +5,7 @@ classdef ctd < us191.serial
   % s.close
   %
   
-  properties (Access = private)
+  properties (Access = public)
     fileName = 'test.hex'
     delay = 0.5
   end
