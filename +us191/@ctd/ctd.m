@@ -4,47 +4,75 @@ classdef ctd < us191.serial
     
     properties (Access = private)
         trame
-        file_t_name
+        fileName = 'test.hex'
+        tempo = 0.5
     end
     
     properties (Access = private)
         listenerHandle % Property for listener handle
+        fid
     end
     
     methods
         
+        % constructor
         function obj = ctd(varargin)
             obj@us191.serial(varargin{:});
             obj.listenerHandle = addlistener(obj,'sentenceAvailable',@obj.handleEvnt);
         end
         
-        function commands(obj)
-            obj.open()
-            fprintf(obj,'CRL%s', 'R');      % Reset buffer
-            fprintf(obj,'CRL%s', 'A01');    % Scans average deckunit
-            fprintf(obj,'CRL%s', 'X0');     % Suppress data word null
-            fprintf(obj,'CRL%s', 'NY');     % Add Lat/Long
-            fprintf(obj,'CRL%s', 'GR');     % Put data into RS232
-            pause(1)                        % Wait one second
-            
-        end
-
-        function save(obj)
-            obj.trame = textscan(obj.sentence, '%s');   %Get trame of serial port
-            fopen(obj.file_t_name,'w');                 %Open file for writing
-            fwrite(obj.file_t_name,obj.trame);          %Save trame in file
-        end
-
-        function close(obj)
-            
-            fprintf(obj,'CRL%s', 'S');      %deckunit stop putting datas
-            fclose(obj.file_t_name);        %Close file
-            delete(obj.listenerHandle);     
-            close@us191.serial(obj);
+        % init send initialization commands to deck-unit SBE11
+        function open(obj)
+            open@us191.serial(obj)
+            fprintf(obj.sp, 'R\n');      % Reset buffer
+            pause(obj.tempo);
+            fprintf(obj.sp, 'U\n');      % Reset words
+            pause(obj.tempo);
+            fprintf(obj.sp, 'A01\n');    % Scans average deckunit
+            pause(obj.tempo);
+            fprintf(obj.sp, 'X0\n');
+            pause(obj.tempo);
+            fprintf(obj.sp, 'X1\n');
+            pause(obj.tempo);
+            fprintf(obj.sp, 'X3\n');
+            pause(obj.tempo);
+            fprintf(obj.sp, 'X4\n');
+            pause(obj.tempo);
+            fprintf(obj.sp, 'X5\n');
+            pause(obj.tempo);
+            fprintf(obj.sp, 'X6\n');     % Suppress A/D word
+            pause(obj.tempo);
+            fprintf(obj.sp, 'X7\n');
+            pause(obj.tempo);
+            fprintf(obj.sp, 'X8\n');     % Suppress A/D word
+            pause(obj.tempo);
+            fprintf(obj.sp, 'addSPAR=N\n'); % Suppress SPAR word
+            pause(obj.tempo);
+            %             fprintf(obj.sp, 'DS\n');
+            %             pause(1);
+            obj.fid = fopen(obj.fileName, 'wt');
+            fprintf(obj.sp, 'GR\n');
+            % pause(obj.tempo);
             
         end
         
-    end
+        % call when data available on serial port
+        function handleEvnt(obj,~,~)
+            fprintf(1, '%s\n', obj.sentence);
+            fprintf(obj.fid, '%s\n', obj.sentence);
+        end % end of function handleEvnt
+        
+        function close(obj)
+            fprintf(obj.sp, 'S\n');      % stop deck-unit acquisition
+            pause(obj.tempo);
+            fprintf(obj.sp, 'R\n');      % Reset buffer
+            pause(obj.tempo);
+            fclose(obj.fid);        %Close file
+            delete(obj.listenerHandle);
+            close@us191.serial(obj);
+        end % end of close
+        
+    end  % end of public methods
     
-end
+end % end of ctd class
 
