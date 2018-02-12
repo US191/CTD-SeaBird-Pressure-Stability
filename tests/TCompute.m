@@ -9,8 +9,7 @@ classdef TCompute < matlab.unittest.TestCase
     trame = {...
       '106B570ACF6883646910BA460A87706DEFFF882FFFFFFFFFFFFFFF000000719241',...
       '0C6C77150B2C850F460CBD28148934AB1972E7712F40D02B472FF0000000A3E3FC' }
-    %  pressure = {2.988, 1653.143}
-    pressure = {10.638, 1663.294}
+    pressure = {0.502, 1653.143}
     temp = {13.95,24.13}
     hexFile = 'fr27001.hex'
     cnvFile = 'fr27001.cnv'
@@ -33,14 +32,15 @@ classdef TCompute < matlab.unittest.TestCase
     %
     function testPressure(obj)
       for i = 1:length(obj.trame)
-        decoder = myDecode();
-        computer = myCompute(obj.fileXmlcon{i});
+        md = myDecode();
+        mc = myCompute(obj.fileXmlcon{i});
         theTrame = obj.trame{i};
-        raw = decoder.decode(theTrame);
-        [p,t] = computer.compute(raw.frequencies(3), raw.pressureTemperature);
-        obj.verifyEqual(p, obj.pressure{i},'AbsTol',0.001,...
+        raw = md.decode(theTrame);
+        t = mc.computeTemp(raw.pressureTemperature);
+        p = mc.compute(raw.frequencies(3), t);
+        obj.verifyEqual(p, obj.pressure{i},'RelTol',0.01,...
           'Difference between actual and expected exceeds relative tolerance');
-        obj.verifyEqual(t, obj.temp{i},'AbsTol',0.01,...
+        obj.verifyEqual(t, obj.temp{i},'RelTol',0.01,...
           'Difference between actual and expected exceeds relative tolerance');
       end
     end
@@ -48,8 +48,8 @@ classdef TCompute < matlab.unittest.TestCase
     function testPressureFromFile(obj)
       fidHex = fopen(obj.hexFile,'r');
       fidCnv = fopen(obj.cnvFile,'r');
-      decoder = myDecodeFromFile(5,4,0);
-      computer = myCompute(obj.fileXmlcon{2});
+      md = myDecodeFromFile(5,4,0);
+      mc = myCompute(obj.fileXmlcon{2});
       while ~feof(fidHex)
         theTrame = fgetl(fidHex);
         theBuf = fgetl(fidCnv);
@@ -57,14 +57,14 @@ classdef TCompute < matlab.unittest.TestCase
         P = theData(3);
         F = theData(15);
         TP = theData(16);
-        raw = decoder.decode(theTrame);
+        raw = md.decode(theTrame);
         t = mc.computeTemp(raw.pressureTemperature);
         p = mc.compute(raw.frequencies(3), t);
-        obj.verifyEqual(raw.frequencies(3), F,'AbsTol',0.001,...
+        obj.verifyEqual(raw.frequencies(3), F,'RelTol',0.001,...
           'Difference between actual and expected exceeds relative tolerance');
-        obj.verifyEqual(t, TP,'AbsTol',0.01,...
+        obj.verifyEqual(t, TP,'RelTol',0.01,...
           'Difference between actual and expected exceeds relative tolerance');
-        obj.verifyEqual(p, P,'AbsTol',0.001,...
+        obj.verifyEqual(p, P,'RelTol',0.01,...
           'Difference between actual and expected exceeds relative tolerance');
       end
       
