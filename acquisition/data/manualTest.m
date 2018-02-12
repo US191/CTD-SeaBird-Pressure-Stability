@@ -54,3 +54,19 @@ f = 34455.074; t = 23.93; P = 2022.451;
 p = mc.computePress(f,t);
 fprintf(1, 'Press= %8.3fdb,  Expected: %8.3f, Temp= %5.2f°C\n', p, P, t);
 fprintf(1,'\n');
+
+% test labo, 11/2/2018
+% remove word 0,1,3,4,5,6,7,8 with Xn command
+% 8143857702BF
+P = 0;
+mc = compute('tests/1263.xml');
+md = decodeFromFile(1,0,0);
+raw = md.decodeTrame('8143857702BF');
+fprintf(1, 'freq = %9.3fhz,  rawTemp = %4d,  modulo = %03d\n',raw.frequencies(3), ...
+  raw.pressureTemperature, raw.modulo);
+t = mc.computeTemp(raw.pressureTemperature);
+p = mc.computePress(raw.frequencies(3), t);
+fprintf(1, 'Press= %8.3fdb,  Expected: %8.3f Temp= %5.2f°C\n', p, P, t);
+fprintf(1,'\n');
+
+
