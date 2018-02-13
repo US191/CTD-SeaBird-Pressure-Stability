@@ -136,7 +136,7 @@ classdef ctd < us191.serial & decode & compute
       raw = obj.decodeTrame(obj.sentence);
       t = obj.computeTemp(raw.pressureTemperature);
       p = obj.computePress(raw.frequencies, t);
-      fprintf(1, '   Press= %8.3fdb, Temp= %5.2f°C\n', p, t);
+      fprintf(1, '   Press= %8.3fdb, Temp= %5.2f°C Modulo: %3d\n', p, t, raw.modulo);
       % add header with station number, date, time and position
       fprintf(obj.dataFid, '%8.3f, %5.2f\n', p, t);
       
@@ -145,7 +145,7 @@ classdef ctd < us191.serial & decode & compute
     function sendCommand(obj, cmds)
       for cmd = cmds
         fprintf(obj.sp, '%s\n', char(cmd));
-        pause(obj.delayo);
+        pause(obj.delay);
       end
     end
     
