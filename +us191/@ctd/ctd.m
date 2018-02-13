@@ -1,18 +1,40 @@
 classdef ctd < us191.serial & decode & compute
-  %CTD collect and compute pressure from deck-unit SBE11+ with serial port
-  % s = us191.ctd('COM9','baudrate',19200,'terminator','CR/LF')
+  %CTD collect and compute in real time pressure from deck-unit SBE11+
+  % connected with a serial RS232 port 
+  %
+  % usage:
+  % s = us191.ctd('1263.xml','COM9','baudrate',19200,'terminator','CR/LF')
   % s.open
   % s.close
+  % s =
+  %   Port:       'COM9'
+  %   BaudRate:   19200
+  %   DataBits:   8
+  %   StopBits:   1
+  %   Parity:     'none'
+  %   Terminator: 'CR/LF'
+  %   Status:     'not connected'
+  %   Echo:       'false'
+  %
+  %   Raw file:   'test.hex'
+  %   Data file:  'test.cnv'
+  %   Delay:       0.5
+  %
+  % change COM port:
+  % s.setPort('COM10')
   %
   
   properties (Access = public)
-    fileName = 'test.hex'
+    % TODOS, create filenames from dateTime
+    rawFileName  = 'test.hex'  % by default
+    dataFileName = 'test.cnv'
     delay = 0.5
   end
   
   properties (Access = private)
     listenerHandle % Property for listener handle
-    fid
+    rawFid                  % raw hex file descriptor
+    dataFid                 % processed file descriptor
     initSbe11 = {...
       'R',...               % reset buffer
       'U',...               % reset words
@@ -31,7 +53,7 @@ classdef ctd < us191.serial & decode & compute
     % ctd constructor
     function obj = ctd(varargin)
       if( isa(varargin{1}, 'char'))
-        % set serial port with first argument, eg COMx
+        % gives the XML pressure configuration file as the first argument
         fileXmlcon = varargin{1};
       else
         error('us191:ctd', '%s is an invalid xml file ', varargin{1});
@@ -47,23 +69,34 @@ classdef ctd < us191.serial & decode & compute
     function open(obj)
       open@us191.serial(obj)
       sendCommand(obj.initSbe11);
-      obj.fid = fopen(obj.fileName, 'wt');
+      obj.rawFid = fopen(obj.rawFileName, 'wt');  % open raw file
+      obj.dataFid = fopen(obj.dataFileName, 'wt');
       sendCommand(obj.startSbe11);
     end
     
     function close(obj)
       sendCommand(obj.stopSbe11)
-      fclose(obj.fid);        %Close file
+      fclose(obj.rawFid);        % close raw file
+      fclose(obj.dataFid);
       delete(obj.listenerHandle);
       close@us191.serial(obj);
     end % end of close
     
-    function set.fileName(obj, fileName)
-      obj.fileName = fileName;
+    % setter and getter methods for public properties
+    function set.rawFileName(obj, rawFileName)
+      obj.rawFileName = rawFileName;
     end
     
-    function fileName = get.fileName(obj)
-      fileName = obj.fileName;
+    function rawFileName = get.rawFileName(obj)
+      rawFileName = obj.rawFileName;
+    end
+    
+    function set.dataFileName(obj, dataFileName)
+      obj.dataFileName = dataFileName;
+    end
+    
+    function dataFileName = get.dataFileName(obj)
+      dataFileName = obj.dataFileName;
     end
     
     function set.delay(obj, delay)
@@ -82,8 +115,9 @@ classdef ctd < us191.serial & decode & compute
       
       % display properties
       % ------------------
-      fprintf('  FileName:   ''%s''\n', obj.fileName);
-      fprintf('  Delay:      ''%3.1f''\n', obj.delay);
+      fprintf('  Raw file:   ''%s''\n', obj.rawFileName);
+      fprintf('  Data file:  ''%s''\n', obj.dataFileName);
+      fprintf('  Delay:       %3.1f\n', obj.delay);
       
       % diplay methods list in hypertext link
       % -------------------------------------
@@ -98,11 +132,13 @@ classdef ctd < us191.serial & decode & compute
     % call when data available on serial port
     function handleEvnt(obj,~,~)
       fprintf(1, '%s', obj.sentence);
-      fprintf(obj.fid, '%s\n', obj.sentence);
+      fprintf(obj.rawFid, '%s\n', obj.sentence);
       raw = obj.decodeTrame(obj.sentence);
       t = obj.computeTemp(raw.pressureTemperature);
       p = obj.computePress(raw.frequencies, t);
       fprintf(1, '   Press= %8.3fdb, Temp= %5.2f°C\n', p, t);
+      % add header with station number, date, time and position
+      fprintf(obj.dataFid, '%8.3f, %5.2f\n', p, t);
       
     end % end of function handleEvnt
     
