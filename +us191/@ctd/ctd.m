@@ -29,6 +29,8 @@ classdef ctd < us191.serial & decode & compute
         rawFileName  = 'test.hex'  % by default
         dataFileName = 'test.cnv'
         delay = 0.5
+        pressure
+        modulo
     end
     
     properties (Access = private)
@@ -136,10 +138,11 @@ classdef ctd < us191.serial & decode & compute
             fprintf(obj.rawFid, '%s\n', obj.sentence);
             raw = obj.decodeTrame(obj.sentence);
             t = obj.computeTemp(raw.pressureTemperature);
-            p = obj.computePress(raw.frequencies, t);
-            fprintf(1, '   Press= %8.3fdb, Temp= %5.2f°C Modulo: %3d\n', p, t, raw.modulo);
+            obj.modulo = raw.modulo;
+            obj.pressure = obj.computePress(raw.frequencies, t);
+            fprintf(1, '   Press= %8.3fdb, Temp= %5.2f°C Modulo: %3d\n', obj.pressure, t, raw.modulo);
             % add header with station number, date, time and position
-            fprintf(obj.dataFid, '%8.3f, %5.2f\n', p, t);
+            fprintf(obj.dataFid, '%8.3f, %5.2f\n', obj.pressure, t);
             
         end % end of function handleEvnt
         
