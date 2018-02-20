@@ -4,7 +4,7 @@ classdef stat < handle
     %   Detailed explanation goes here
     
     properties
-        dataFileName = 'test.cnv'
+        dataName = 'test.cnv'
         statFileName = 'test.txt'
         average                     %mean or average
         variance                
@@ -28,7 +28,7 @@ classdef stat < handle
         %Open files
         function obj = stat()
             obj.statFid = fopen(obj.statFileName, 'wt'); 
-            obj.dataFid = fopen(obj.dataFileName, 'r');
+            obj.dataFid = fopen(obj.dataName, 'r');
             
         end
         

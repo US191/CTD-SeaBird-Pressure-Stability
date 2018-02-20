@@ -1,8 +1,12 @@
-classdef processing < us191.ctd
+classdef processing < us191.ctd & stat
     %UNTITLED4 Summary of this class goes here
     %   Detailed explanation goes here
     
     properties (Access = public)
+        
+        %Value Timer
+        timer
+        
         %Parameters values
         port
         baudRate
@@ -63,11 +67,15 @@ classdef processing < us191.ctd
         hdlReadModulo
         
         %Panel Treatment
-        hdlTextStandDev
-        hdlTextMedian
         hdlTextMeas
+        hdlTextMedian
+        hdlReadMedian
         hdlTextVar
+        hdlReadVar
         hdlTextMean
+        hdlReadMean
+        hdlTextStandDev
+        hdlReadStandDev 
     end
     
     methods %Public
@@ -83,8 +91,7 @@ classdef processing < us191.ctd
                 'WindowStyle', 'normal', ...
                 'numbertitle', 'off',...
                 'HandleVisibility','on',...
-                'Position',[100 400 700 620],...
-                'CloseRequestFcn',{@(src,evt) closeFig(obj)});
+                'Position',[100 400 700 620]);
             
             obj.hdlMainPanel = uipanel(obj.hdlFig, ...
                 'title', 'Configuration ', ...
@@ -137,7 +144,8 @@ classdef processing < us191.ctd
                 'Position' , [ 20 120 100 30 ] ,...
                 'String' ,' Timer ' ,...
                 'FontWeight', 'bold',...
-                'FontSize',9 );
+                'FontSize',9 ,...
+                'callback', {@(src,evt) Fstat(obj,src)});
             
             obj.hdlWriteTimer = uicontrol ( obj.hdlPanelSerial ,...
                 'style' , ' edit' ,...
@@ -330,7 +338,11 @@ classdef processing < us191.ctd
                 'FontWeight', 'bold',...
                 'FontSize',10);
             
-            
+            obj.hdlReadMean = uicontrol ( obj.hdlPanelTreat ,...
+                'style' , 'Text' ,...
+                'String',obj.average,...
+                'BackGroundcolor','w',...
+                'position' , [20 60 90 25 ] );
             
             obj.hdlTextVar = uicontrol( obj.hdlPanelTreat  ,...
                 'style' , 'Text' , ...
@@ -339,6 +351,12 @@ classdef processing < us191.ctd
                 'FontWeight', 'bold',...
                 'FontSize',10 );
             
+            obj.hdlReadVar = uicontrol ( obj.hdlPanelTreat ,...
+                'style' , 'Text' ,...
+                'BackGroundcolor','w',...
+                'String',obj.variance,...
+                'position' , [180 60 90 25 ]  );
+            
             obj.hdlTextMedian = uicontrol( obj.hdlPanelTreat  ,...
                 'style' , 'Text' ,...
                 'Position', [ 340 80 100 30 ] ,...
@@ -346,7 +364,11 @@ classdef processing < us191.ctd
                 'FontWeight', 'bold',...
                 'FontSize',10 );
             
-            
+            obj.hdlReadMedian = uicontrol ( obj.hdlPanelTreat ,...
+                'style' , 'Text' ,...
+                'String',obj.med,...
+                'BackGroundcolor','w',...
+                'position' , [345 60 90 25 ]);
             
             obj.hdlTextStandDev = uicontrol( obj.hdlPanelTreat  ,...
                 'style' , 'Text' ,...
@@ -355,13 +377,17 @@ classdef processing < us191.ctd
                 'FontWeight', 'bold',...
                 'FontSize',10 );
             
-            
+            obj.hdlReadStandDev = uicontrol ( obj.hdlPanelTreat ,...
+                'style' , 'Text' ,...
+                'BackGroundcolor','w',...
+                'position' , [520 60 90 25 ]);          
             
         end % end of setUicontrols
         
         %Callback Parameters Serial
         %-----------------------------
-            
+        
+             
         function selectValPort(obj, src)
             p = us191.serial.Discover;
             obj.valPort =  get(src, 'Value');
@@ -458,10 +484,24 @@ classdef processing < us191.ctd
         end 
    
         function open(obj)
+           %Get date in all file name
            FileName = datestr(now);
            obj.rawFileName = fprintf('%s.hex',FileName) ;
            obj.dataFileName = fprintf('%s.cnv',FileName) ;
+           obj.dataName = fprintf('%s.cnv',FileName);
+           obj.statFileName = fprintf('%s.mat',FileName);
+           
+           %Start acquisition
            open@us191.ctd(obj)
+           
+           %Start Timer
+           obj.timer =  str2double(get(obj.hdlWriteTimer, 'String'));
+            for i = obj.timer : -1 : 0
+                obj.timer = obj.timer -1;
+                pause(1)
+                set(obj.hdlWriteTimer,'String',obj.timer);
+            end
+                
         end 
         
         function close(obj)
