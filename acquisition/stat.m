@@ -10,7 +10,7 @@ classdef stat < handle
         variance                
         med                         %median
         standDev                    %STandard deviation
-        
+        nbValue    
     end
     
     properties (Access = private)
@@ -19,7 +19,7 @@ classdef stat < handle
         data                %Data in cnv file
         sizeBuffer = 25;    %Cacul stat on 41 values of pressure
         sizeData            %Nb value in file cnv
-        nbValue             %number pressure measure
+                 %number pressure measure
         
         
     end
@@ -45,7 +45,7 @@ classdef stat < handle
          %Circular buffer homemade
          function statistique(obj)
          %Definition number of stat value and data in file cnv
-         obj.nbValue = int16(obj.sizeData(1)/obj.sizeBuffer)-1;    
+         obj.nbValue = int16(obj.sizeData(1)/obj.sizeBuffer)-2;    
          obj.average = ones(obj.nbValue, 1);
          obj.med = ones(obj.nbValue, 1);
          obj.variance = ones(obj.nbValue, 1);
@@ -65,10 +65,10 @@ classdef stat < handle
                 
                 
          end
-        disp(obj.average);
-        disp(obj.med);
-        disp(obj.variance);
-        disp(obj.standDev);
+         disp(obj.average);
+%         disp(obj.med);
+%         disp(obj.variance);
+%         disp(obj.standDev);
                 
         
                 fprintf(obj.statFid,'%.4f, %.4f, %.8f, %.4f\n',...
