@@ -20,8 +20,7 @@ classdef stat < handle
         sizeBuffer = 25;    %Cacul stat on 41 values of pressure
         sizeData            %Nb value in file cnv
                  %number pressure measure
-        
-        
+
     end
     
     methods
@@ -65,7 +64,7 @@ classdef stat < handle
                 
                 
          end
-         disp(obj.average);
+%          disp(obj.average);
 %         disp(obj.med);
 %         disp(obj.variance);
 %         disp(obj.standDev);
