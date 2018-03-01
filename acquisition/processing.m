@@ -1,4 +1,4 @@
-classdef processing < us191.ctd & stat
+classdef processing < us191.ctd
     %UNTITLED4 Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -13,6 +13,7 @@ classdef processing < us191.ctd & stat
         dataBits
         stopBits
         terminator 
+        xmlFile
         
         %Values in each UIcontrol
         valPort = 1
@@ -81,7 +82,24 @@ classdef processing < us191.ctd & stat
     methods %Public
         
         %Constructor
-        function obj = processing(varargin)
+        function obj = processing(~)
+            
+            % initialisation
+            theXmlFile = 'data/1263.xml';
+            theSerialPort = 'COM2';
+            theBaudRate = 19200;
+            theTerminator = 'CR/LF';
+            
+            % Object Initialization
+            % Must call base-class constructor before accessing object
+            obj@us191.ctd(theXmlFile,theSerialPort,'baudrate',theBaudRate,...
+                'terminator',theTerminator)
+            
+            % properties initialization
+            obj.port = theSerialPort;
+            obj.baudRate = theBaudRate;
+            obj.terminator = theTerminator;
+            obj.xmlFile = theXmlFile;
             
             obj.hdlFig = figure( ...
                 'Name','Processing ',...
@@ -120,8 +138,7 @@ classdef processing < us191.ctd & stat
             
             loadConfig(obj);
             obj.setUicontrols;
-            
-            
+             
         end
         
         
@@ -223,14 +240,6 @@ classdef processing < us191.ctd & stat
                 'Position' ,[260 40 100 30],...
                 'callback', {@(src,evt) selectValTerminator(obj,src)} );
             
-            %ButtonValid
-            obj.hdlButtonValid = uicontrol (obj.hdlPanelSerial ,...
-                'style' , 'push' ,...
-                'position' , [400 90 60 50 ] ,...
-                'FontWeight', 'bold',...
-                'string' , 'VALID',...
-                'callback', @ValidParSerial);
-            
             %CheckBox
             obj.hdlFrameBox = uicontrol ( obj.hdlPanelSerial ,...
                 'style' , 'frame' ,...
@@ -268,19 +277,13 @@ classdef processing < us191.ctd & stat
             
             obj.hdlButtonStart = uicontrol (obj.hdlPanelMeasure ,...
                 'style' , 'push' ,...
-                'position' , [115 30 60 50 ] ,...
+                'position' , [170 30 60 50 ] ,...
                 'string' , 'START',...
                 'FontWeight', 'bold',...
-                'callback', @open);
+                'BackGroundcolor','g',...
+                'callback', {@(src,evt) open(obj,src)});
 
-            obj.hdlButtonStop = uicontrol (obj.hdlPanelMeasure ,...
-                'style' , 'push' ,...
-                'position' , [210 30 60 50 ] ,...
-                'string' , 'STOP',...
-                'FontWeight', 'bold',...
-                'callback', @close);
-
-            
+          
             obj.hdlTextMeas = uicontrol(obj.hdlPanelMeasure ,...
                 'style' , 'Text' ,...
                 'Position' , [ 350 120 200 30 ] ,...
@@ -473,26 +476,20 @@ classdef processing < us191.ctd & stat
         
         %Callback Measures
         %-----------------------------
-        
-        function validParSerial(obj)
-            
-           validParSerial@us191.ctd('1263.xml', obj.port,...
-               'BaudRate',obj.baudRate,...
-               'DataBits',obj.dataBits,...
-               'StopBits',obj.stopBits,...
-               'Terminator',obj.terminator);
-        end 
    
-        function open(obj)
+        function open(obj, src)
            %Get date in all file name
+           set(src, 'BackGroundcolor','r','String','STOP');
            FileName = datestr(now);
            obj.rawFileName = fprintf('%s.hex',FileName) ;
            obj.dataFileName = fprintf('%s.cnv',FileName) ;
-           obj.dataName = fprintf('%s.cnv',FileName);
-           obj.statFileName = fprintf('%s.mat',FileName);
+%            obj.dataName = fprintf('%s.cnv',FileName);
+%            obj.statFileName = fprintf('%s.mat',FileName);
            
            %Start acquisition
            open@us191.ctd(obj)
+           
+           %Set
            
            %Start Timer
            obj.timer =  str2double(get(obj.hdlWriteTimer, 'String'));
