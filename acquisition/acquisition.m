@@ -13,7 +13,7 @@ classdef acquisition < handle
     med
     
     % move as private after debug
-    ctd            % CTD on serial port
+    %ctd            % CTD on serial port
     port = 1
     baudRate = 7   % default 19200
     dataBits = 2   % default 8
@@ -340,19 +340,20 @@ classdef acquisition < handle
       % Start
       uicontrol(obj.hdlPanelMeasure ,...
         'style' , 'Text' , ...
+        'String' ,'Acquisition' ,...
         'units', 'normalized', ...
         'HorizontalAlignment', 'left',...
         'Position' , [0.05 0.80 0.2 0.1] ,...
-        'String' ,'Acquisition' ,...
         'FontWeight', 'bold',...
         'FontSize',10  );
       
       obj.hdlButtonStart = uicontrol (obj.hdlPanelMeasure ,...
         'style' , 'push' ,...
+        'string' , 'START',...
+        'userdata', false,...
         'units', 'normalized', ...
         'HorizontalAlignment', 'left',...
         'position' , [0.05 0.40 0.2 0.3 ] ,...
-        'string' , 'START',...
         'FontWeight', 'bold',...
         'callback', {@(src,evt) startAcquisition(obj,src)});
       
@@ -546,35 +547,42 @@ classdef acquisition < handle
       % get serial port parameters from uicontrol choices
       
       % change buttun text
-      set(src, 'String', 'Running...');
-      
-      % get serial port value from popup indice
-      theSerialPort = obj.portString{obj.port};
-      theBaudRate = str2double(obj.baudRateString{obj.baudRate});
-      theDataBits = str2double(obj.dataBitsString{obj.dataBits});
-      theStopBits = str2double(obj.stopBitsString{obj.stopBits});
-      theParity = obj.parityString{obj.parity};
-      theTerminator = obj.terminatorString{obj.terminator};
-      
-      % Start acquisition
-      obj.ctd = us191.ctd(obj.xmlFile,theSerialPort,'baudrate',theBaudRate,...
-        'databits', theDataBits, 'stopbits', theStopBits, ...
-        'parity', theParity, 'terminator',theTerminator);
-      
-      % Start Timer
-      t = timer;
-      t.StartDelay = str2double(obj.delay);
-      t.TimerFcn = {@obj.stopAcquisition, src};
-      start(t);  
+      if get(src, 'userdata') == false
+          set(src, 'String', 'Running...');
+          set(src, 'UserData', true);
+          
+          % get serial port value from popup indice
+          theSerialPort = obj.portString{obj.port};
+          theBaudRate = str2double(obj.baudRateString{obj.baudRate});
+          theDataBits = str2double(obj.dataBitsString{obj.dataBits});
+          theStopBits = str2double(obj.stopBitsString{obj.stopBits});
+          theParity = obj.parityString{obj.parity};
+          theTerminator = obj.terminatorString{obj.terminator};
+          
+          % Start acquisition
+          ctd = us191.ctd(obj.xmlFile,theSerialPort,'baudrate',theBaudRate,...
+              'databits', theDataBits, 'stopbits', theStopBits, ...
+              'parity', theParity, 'terminator',theTerminator);
+          
+          % define ctd files
+          %ctd.rawFileName(strcat(obj.station, '.hex'));
+          
+          % Start Timer
+          t = timer;
+          t.StartDelay = str2double(obj.delay);
+          t.TimerFcn = {@obj.stopAcquisition, src, ctd};
+          start(t);
+      end
     end
     
     % stop acquisition
-    function stopAcquisition(obj,t,~,src) 
+    function stopAcquisition(obj,t,~,src, ctd) 
       set(src, 'String', 'Start');
-      fprintf(1,'timer elapsed');
+      set(src, 'UserData', false);
+      fprintf(1,'timer elapsed after delay: %s sec\n', obj.delay);
       stop(t);
       delete(t);
-      obj.ctd.close;
+      close(ctd);
       
     end
     
