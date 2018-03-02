@@ -572,7 +572,7 @@ classdef acquisition < handle
                 % open serial port and send commands to the deck-unit
                 ctd.open;
                 
-                % start the timer and callback acquisition
+                % start the timer and callback for acquisition
                 t = timer;
                 t.StartDelay = str2double(obj.delay);
                 t.TimerFcn = {@obj.stopAcquisition, src, ctd};
@@ -591,12 +591,14 @@ classdef acquisition < handle
             close(ctd);
         end
         
-        function changeButtonStartToGreen(obj,t,~,src)
+        % TODOS: change on anonymous function
+        function changeButtonStartToGreen(obj,t,~,src) %#ok<INUSL>
             set(src,'BackgroundColor', 'g');
             set(src, 'String', 'Running...');
         end
         
-        function changeButtonStartToRed(obj,t,~,src)
+         % TODOS: change on anonymous function
+        function changeButtonStartToRed(obj,t,~,src) %#ok<INUSL>
             set(src,'BackgroundColor', 'r');
             set(src, 'String', 'Start');
         end
