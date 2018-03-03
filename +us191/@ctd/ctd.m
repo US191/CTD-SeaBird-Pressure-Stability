@@ -51,6 +51,10 @@ classdef ctd < us191.serial & decode & compute
             'R'}                  % reset buffer
     end
     
+  events
+    dataAvailable
+  end
+    
     methods
         
         % ctd constructor
@@ -140,9 +144,13 @@ classdef ctd < us191.serial & decode & compute
             t = obj.computeTemp(raw.pressureTemperature);
             obj.modulo = raw.modulo;
             obj.pressure = obj.computePress(raw.frequencies, t);
-            fprintf(1, '   Press= %8.3fdb, Temp= %5.2f°C Modulo: %3d\n', obj.pressure, t, raw.modulo);
+            fprintf(1, '   Press= %8.3fdb, Temp= %5.2f°C Modulo: %3d\n', ...
+              obj.pressure, t, raw.modulo);
             % add header with station number, date, time and position
             fprintf(obj.dataFid, '%8.3f, %5.2f\n', obj.pressure, t);
+            
+            % send notification
+            notify(obj, 'dataAvailable');
             
         end % end of function handleEvnt
         
