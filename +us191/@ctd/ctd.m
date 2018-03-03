@@ -147,7 +147,7 @@ classdef ctd < us191.serial & decode & compute
         end % end of function handleEvnt
         
         function sendCommand(obj, cmds)
-            theCmd = [];
+            %theCmd = [];
             for cmd = cmds
                 theCmd = char(cmd);
                 fprintf(1, '%s\n', theCmd);
