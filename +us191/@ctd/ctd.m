@@ -31,6 +31,7 @@ classdef ctd < us191.serial & decode & compute
         delay = 0.5
         pressure
         modulo
+        echo = false
     end
     
     properties (Access = private)
@@ -114,6 +115,14 @@ classdef ctd < us191.serial & decode & compute
             delay = obj.delay;
         end
         
+        function set.echo(obj, echo)
+            obj.echo = echo;
+        end
+        
+        function echo = get.echo(obj)
+            echo = obj.echo;
+        end
+        
         % display ctd object
         % ---------------------
         function disp(obj)
@@ -125,6 +134,7 @@ classdef ctd < us191.serial & decode & compute
             fprintf('  Raw file:   ''%s''\n', obj.rawFileName);
             fprintf('  Data file:  ''%s''\n', obj.dataFileName);
             fprintf('  Delay:       %3.1f\n', obj.delay);
+            fprintf('  Echo:       ''%s''\n', obj.echo);
             
             % diplay methods list in hypertext link
             % -------------------------------------
@@ -138,19 +148,28 @@ classdef ctd < us191.serial & decode & compute
         
         % call when data available on serial port
         function handleEvnt(obj,~,~)
-            fprintf(1, '%s', obj.sentence);
-            fprintf(obj.rawFid, '%s\n', obj.sentence);
-            raw = obj.decodeTrame(obj.sentence);
-            t = obj.computeTemp(raw.pressureTemperature);
-            obj.modulo = raw.modulo;
-            obj.pressure = obj.computePress(raw.frequencies, t);
-            fprintf(1, '   Press= %8.3fdb, Temp= %5.2f°C Modulo: %3d\n', ...
-              obj.pressure, t, raw.modulo);
-            % add header with station number, date, time and position
-            fprintf(obj.dataFid, '%8.3f, %5.2f\n', obj.pressure, t);
             
-            % send notification
-            notify(obj, 'dataAvailable');
+            raw = obj.decodeTrame(obj.sentence);
+            temperature = obj.computeTemp(raw.pressureTemperature);
+            obj.modulo = raw.modulo;
+            % be careful with frequencies, one vale with this CTD
+            % initialisation
+            obj.pressure = obj.computePress(raw.frequencies, temperature);
+            if obj.echo
+                fprintf(1, '%s   ', obj.sentence);
+                fprintf(1, 'Press= %8.3fdb, Temp= %5.2f°C Modulo: %3d\n', ...
+                    obj.pressure, temperature, raw.modulo);
+            end
+            % save data to .hex and .cnv files
+            % add header with station number, date, time and position
+            fprintf(obj.rawFid, '%s\n', obj.sentence);
+            fprintf(obj.dataFid, '%8.3f, %5.2f\n', obj.pressure, temperature);
+            
+            % define Event-Specific Data
+            evtdata = ToggleEventData(obj.pressure,temperature,...
+                raw.modulo,raw.frequencies);
+            % send notification with evtdata object
+            notify(obj, 'dataAvailable', evtdata);
             
         end % end of function handleEvnt
         
