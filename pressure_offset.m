@@ -1,6 +1,6 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This script calculate offset for SeaBird pressure sensor from           %
-% ship barometer                                                          %
+% reference barometer                                                     %
 % Autor: Pierre Rousselot - US191 IMAGO                                   %
 % Date: 03/03/2018                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -26,7 +26,8 @@ C        = 0.689476;      % factor conversion in dbar/psi
 
 %% Calcul
 P_atm    = (P_baro + ((P_baro * H_baro) / (29.2 * (T_air + K)))) * 0.01; % atmospheric pressure at sea level in dbar (Meteo-France)
-P_CTDa   = P_CTD + (Ap * C);                                   % absolute pressure from pressure seabird sensor
+P_CTDa   = P_CTD + (Ap * C);                                             % CTD absolute pressure from seabird relative pressure in dbar
+P_CTDa0  = (P_CTDa + ((P_CTDa * H_CTD) / (29.2 * (T_air + K))));         % CTD absolute pressure at sea level in dbar (Meteo-France)
 
-Offset   = P_atm - P_CTDa;                                     % SeaBird pressure sensor offset
+Offset   = P_atm - P_CTDa0;                                              % SeaBird pressure sensor offset
 disp(['Offset = ' num2str(round(Offset*100)/100)]);
