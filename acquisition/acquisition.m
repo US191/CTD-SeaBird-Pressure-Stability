@@ -4,12 +4,6 @@ classdef acquisition < handle
     
     properties (Access = public)
         
-        % variables
-        pressure
-        average
-        variance
-        med
-        
         % ring for averaging every second
         ringAvg = ring(23)
         % timer every second for averaging data
@@ -431,10 +425,10 @@ classdef acquisition < handle
             
             uicontrol( obj.hdlPanelMeasure  ,...
                 'style' , 'Text' ,...
-                'String' ,'Temperature ' ,...
+                'String' ,'Pressure temperature' ,...
                 'units', 'normalized', ...
                 'HorizontalAlignment', 'left',...
-                'Position' , [0.35 0.3 0.2 0.1] ,...
+                'Position' , [0.35 0.3 0.30 0.1] ,...
                 'FontWeight', 'bold',...
                 'FontSize',10);
             
@@ -643,9 +637,11 @@ classdef acquisition < handle
                     'databits', theDataBits, 'stopbits', theStopBits, ...
                     'parity', theParity, 'terminator',theTerminator);
                 
-                % define ctd files
-                ctd.rawFileName = strcat(obj.path,filesep,obj.station, '.hex');
-                ctd.dataFileName = strcat(obj.path,filesep,obj.station, '.cnv');
+                % define ctd files as path\station_[before|after].ext
+                ctd.rawFileName = strcat(obj.path,filesep,...
+                    obj.station, strcat('_',obj.state), '.hex');
+                ctd.dataFileName = strcat(obj.path,filesep,...
+                    obj.station, strcat('_',obj.state), '.cnv');
                 
                 % add listener
                 obj.dataListenerHandle = addlistener(ctd,'dataAvailable',@obj.dataEvnt);
@@ -657,7 +653,7 @@ classdef acquisition < handle
                 obj.ringFinal = ring(str2double(obj.delay));
                 
                 % start the timer and callback for acquisition
-                t = timer('name','acquisition');
+                t = timer('name','timerFinal');
                 t.StartDelay = str2double(obj.delay);
                 t.TimerFcn = {@obj.stopAcquisition, src, ctd};
                 t.StartFcn = {@obj.changeButtonStartToGreen, src};
@@ -683,13 +679,24 @@ classdef acquisition < handle
             close(ctd);
             delete(obj.dataListenerHandle);
             compute(obj.ringFinal);
-%             disp(obj.ringFinal.getMedian);
-%             disp(obj.ringFinal.getStd);
-%             disp(obj.ringFinal.getAverage);
-            set(obj.hdlMedian, 'string', num2str(obj.ringFinal.getMedian));
-            set(obj.hdlStandDev, 'string', num2str(obj.ringFinal.getStd));
-            set(obj.hdlMean, 'string', num2str(obj.ringFinal.getAverage));
-            set(obj.hdlVar, 'string', num2str(obj.ringFinal.getVariance));
+            med = obj.ringFinal.getMedian;
+            stdev = obj.ringFinal.getStd;
+            avg = obj.ringFinal.getAverage;
+            var = obj.ringFinal.getVariance;
+            % display value on UiControls
+            set(obj.hdlMedian, 'string', num2str(med));
+            set(obj.hdlStandDev, 'string', num2str(stdev));
+            set(obj.hdlMean, 'string', num2str(avg));
+            set(obj.hdlVar, 'string', num2str(var));
+            % save data on statistic file (.asc)
+            obj.statFileName = strcat(obj.path,filesep,...
+                    obj.station, strcat('_',obj.state), '.asc');
+            fid = fopen(obj.statFileName, 'wt');
+            fprintf(fid,'Station: %s\n', strcat(obj.station, '_',obj.state));
+            fprintf(fid,'Timer: %d\n', obj.delay);
+            fprintf(fid, 'Median     Mean    StdDev  Variance\n'); 
+            fprintf(fid, '%f %f %f %f\n', med, stdev, avg, var);
+            fclose(fid);
         end
         
         % TODOS: change on anonymous function
@@ -709,6 +716,10 @@ classdef acquisition < handle
             compute(obj.ringAvg);
             % debug
             disp(obj.ringAvg.getAverage);
+            % display median and mean value every seconde on UiControls
+            set(obj.hdlMedian, 'string', num2str(obj.ringAvg.getMedian));
+            set(obj.hdlMean, 'string', num2str(obj.ringAvg.getAverage));
+            % put every second median value to ringFinal
             obj.ringFinal.put(obj.ringAvg.getMedian);
         end
         
