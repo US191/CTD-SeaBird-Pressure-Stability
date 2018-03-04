@@ -695,7 +695,7 @@ classdef acquisition < handle
             fprintf(fid,'Station: %s\n', strcat(obj.station, '_',obj.state));
             fprintf(fid,'Timer: %d\n', obj.delay);
             fprintf(fid, 'Median     Mean    StdDev  Variance\n'); 
-            fprintf(fid, '%f %f %f %f\n', med, stdev, avg, var);
+            fprintf(fid, '%f %f %f %f\n', med,avg,stdev,var);
             fclose(fid);
         end
         
