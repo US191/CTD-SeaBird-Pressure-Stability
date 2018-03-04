@@ -273,7 +273,7 @@ classdef acquisition < handle
                 'string', obj.station, ...
                 'units', 'normalized', ...
                 'position', [0.35 0.83 0.13 0.09], ...
-                'callback', {@(src,evt) selectStation(obj)});
+                'callback', {@(src,evt) selectStation(obj,src)});
             
             % path for data files
             uicontrol(obj.hdlConfigPanel,...
@@ -574,7 +574,7 @@ classdef acquisition < handle
         end
         
         function selectStation(obj, src)
-            obj.station =  get(src, 'value');
+            obj.station =  get(src, 'string');
         end
         
         function selectTimer(obj, src)
