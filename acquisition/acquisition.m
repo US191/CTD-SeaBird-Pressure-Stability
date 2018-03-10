@@ -1,7 +1,7 @@
 classdef acquisition < handle
     %UNTITLED4 Summary of this class goes here
     %   Detailed explanation goes here
-    
+    % Version Morganne
     properties (Access = public)
         % Values in each UIcontrol
         valPort = 1;
