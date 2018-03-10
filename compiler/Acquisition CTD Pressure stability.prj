@@ -1,0 +1,116 @@
+<deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
+  <configuration file="C:\git\matlab\CTD-SeaBird-Pressure-Stability\compiler\Acquisition CTD Pressure stability.prj" location="C:\git\matlab\CTD-SeaBird-Pressure-Stability\compiler" name="Acquisition CTD Pressure stability" target="target.ezdeploy.standalone" target-name="Application Compiler">
+    <param.appname>Acquisition_CTD_Pressure_Stability</param.appname>
+    <param.icon />
+    <param.icons />
+    <param.version>1.0</param.version>
+    <param.authnamewatermark>Morganne Domenge - Jacques Grelet</param.authnamewatermark>
+    <param.email />
+    <param.company>IRD - US191 IMAGO - BREST -2018</param.company>
+    <param.summary>The purpose of this program is to read CTD pressure value on deck
+  before and after profil with a CTD SBE911+ to evaluate sensor drift and</param.summary>
+    <param.description>This program read hex data from a deck-unit SBE11 fron a serial
+  port, extract the pressure and temperature compensation from the
+  hexadecimal sentence at 24 hz per seconde and save raw data in files.
+  All pressure value are stored in a a circular buffer of size 24,
+  and every second, a timer get the median pressure and store it to a
+  circular buffer with the size of the acquisition timer (delay).</param.description>
+    <param.screenshot />
+    <param.guid />
+    <param.installpath.string>\IRD - US191 IMAGO - BREST -2018\Acquisition_CTD_Pressure_Stability\</param.installpath.string>
+    <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
+    <param.logo />
+    <param.install.notes />
+    <param.target.install.notes />
+    <param.intermediate>${PROJECT_ROOT}\Acquisition CTD Pressure stability\for_testing</param.intermediate>
+    <param.files.only>${PROJECT_ROOT}\Acquisition CTD Pressure stability\for_redistribution_files_only</param.files.only>
+    <param.output>${PROJECT_ROOT}\Acquisition CTD Pressure stability\for_redistribution</param.output>
+    <param.logdir>${PROJECT_ROOT}\Acquisition CTD Pressure stability</param.logdir>
+    <param.enable.clean.build>false</param.enable.clean.build>
+    <param.user.defined.mcr.options />
+    <param.target.type>subtarget.standalone</param.target.type>
+    <param.support.packages />
+    <param.web.mcr>true</param.web.mcr>
+    <param.package.mcr>false</param.package.mcr>
+    <param.no.mcr>false</param.no.mcr>
+    <param.web.mcr.name>Acquisition_CTD_web</param.web.mcr.name>
+    <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
+    <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
+    <param.windows.command.prompt>false</param.windows.command.prompt>
+    <param.create.log>true</param.create.log>
+    <param.log.file>acquisition.log</param.log.file>
+    <param.native.matlab>false</param.native.matlab>
+    <param.checkbox>false</param.checkbox>
+    <param.example />
+    <param.help.text />
+    <unset>
+      <param.icon />
+      <param.icons />
+      <param.version />
+      <param.email />
+      <param.screenshot />
+      <param.guid />
+      <param.installpath.string />
+      <param.installpath.combo />
+      <param.logo />
+      <param.target.install.notes />
+      <param.intermediate />
+      <param.files.only />
+      <param.output />
+      <param.logdir />
+      <param.enable.clean.build />
+      <param.user.defined.mcr.options />
+      <param.target.type />
+      <param.support.packages />
+      <param.web.mcr />
+      <param.package.mcr />
+      <param.no.mcr />
+      <param.package.mcr.name />
+      <param.no.mcr.name />
+      <param.native.matlab />
+      <param.checkbox />
+      <param.example />
+      <param.help.text />
+    </unset>
+    <fileset.main>
+      <file>C:\git\matlab\CTD-SeaBird-Pressure-Stability\acquisition\acquisition.m</file>
+    </fileset.main>
+    <fileset.resources />
+    <fileset.package />
+    <fileset.depfun>
+      <file>C:\git\matlab\CTD-SeaBird-Pressure-Stability\+us191\@ctd\ctd.m</file>
+      <file>C:\git\matlab\CTD-SeaBird-Pressure-Stability\+us191\@serial\getAvailableComPort.m</file>
+      <file>C:\git\matlab\CTD-SeaBird-Pressure-Stability\+us191\@serial\serial.m</file>
+      <file>C:\git\matlab\CTD-SeaBird-Pressure-Stability\acquisition\compute.m</file>
+      <file>C:\git\matlab\CTD-SeaBird-Pressure-Stability\acquisition\decode.m</file>
+      <file>C:\git\matlab\CTD-SeaBird-Pressure-Stability\acquisition\readXmlcon.m</file>
+      <file>C:\git\matlab\CTD-SeaBird-Pressure-Stability\acquisition\ring.m</file>
+      <file>C:\git\matlab\CTD-SeaBird-Pressure-Stability\acquisition\ToggleEventData.m</file>
+    </fileset.depfun>
+    <build-deliverables>
+      <file location="${PROJECT_ROOT}\Acquisition CTD Pressure stability\for_testing" name="readme.txt" optional="true">C:\git\matlab\CTD-SeaBird-Pressure-Stability\compiler\Acquisition CTD Pressure stability\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}\Acquisition CTD Pressure stability\for_testing" name="Acquisition_CTD_Pressure_Stability.exe" optional="false">C:\git\matlab\CTD-SeaBird-Pressure-Stability\compiler\Acquisition CTD Pressure stability\for_testing\Acquisition_CTD_Pressure_Stability.exe</file>
+      <file location="${PROJECT_ROOT}\Acquisition CTD Pressure stability\for_testing" name="splash.png" optional="false">C:\git\matlab\CTD-SeaBird-Pressure-Stability\compiler\Acquisition CTD Pressure stability\for_testing\splash.png</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2017b</root>
+      <toolboxes />
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>6.1</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
