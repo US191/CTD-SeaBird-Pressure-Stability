@@ -10,12 +10,16 @@ classdef acquisition < handle
   %     All pressure value are stored in a a circular buffer of size 24,
   %     and every second, a timer get the median pressure and store it to a
   %     circular buffer with the size of the acquisition timer (delay).
-  % 
+  %
   %  Jacques Grelet IRD US191 IMAGO
-  %  Morganne Domenge 
+  %  Morganne Domenge
   %  IRD - Campagne PIRATA-FR28 - march 2018
   
   properties (Access = public)
+    
+    % list of public or private properties to save in config mat file
+    propertiesToSave = {'port','baudRate','dataBits','stopBits',...
+      'terminator','station','state','delay','path','xmlFile'};
     
     % ring for averaging every second
     ringAvg = ring(23)
@@ -24,13 +28,7 @@ classdef acquisition < handle
     % ring with acquisition delay
     ringFinal
     
-    % move as private after debug
-    port = 1
-    baudRate = 7   % default 19200
-    dataBits = 2   % default 8
-    stopBits = 1   % default 1
-    parity = 1     % default none
-    terminator = 3 % default 'CR/LF'
+    
     station = 'FR28001'
     state          % before or after station
     delay   = '5'  % default, 5 s
@@ -53,6 +51,14 @@ classdef acquisition < handle
     stopBitsString = {'1','2'}
     parityString = {'none','even','odd'}
     terminatorString = {'CR','LF','CR/LF'}
+    
+    % move as private after debug
+    port = 1
+    baudRate = 7   % default 19200
+    dataBits = 2   % default 8
+    stopBits = 1   % default 1
+    parity = 1     % default none
+    terminator = 3 % default 'CR/LF'
     
     dataListenerHandle
     
@@ -739,17 +745,11 @@ classdef acquisition < handle
     % call from close figure
     function s = saveConfig(obj)
       
-      % save property values in struct
-      s.port = obj.port;
-      s.baudRate = obj.baudRate;
-      s.dataBits = obj.dataBits;
-      s.stopBits = obj.stopBits;
-      s.terminator = obj.terminator;
-      s.station = obj.station;
-      s.state = obj.state;
-      s.delay = obj.delay;
-      s.path = obj.path;
-      s.xmlFile = obj.xmlFile;
+      % save properties value in a struct
+      for prop = obj.propertiesToSave
+        p = char(prop);
+        s.(p) = obj.(p);
+      end
       
       % save to mat file
       save( obj.configFile, 's', '-v7.3')
@@ -759,18 +759,13 @@ classdef acquisition < handle
     % restore the configuration from user.mat
     function loadConfig(obj)
       
-      % create a struct from public properties of the class
-      theConfig = saveToStruct(obj);
-      
       % test if configFile exist
       if exist(obj.configFile, 'file') == 2
         % load properties values from struct
         load(obj.configFile, 's');
-        props = fieldnames(theConfig);
-        for p = 1:numel(props)
-          if  isfield(s, props{p})
-            obj.(props{p}) = s.(props{p});
-          end
+        for prop = obj.propertiesToSave
+          p = char(prop);
+          obj.(p) = s.(p);
         end
       end
       
@@ -791,17 +786,7 @@ classdef acquisition < handle
       %disp(obj.ringAvg.data);
     end
     
-    % use this function instead of struct(obj)
-    % ----------------------------------------
-    function s = saveToStruct(obj)
-      props = properties(obj);
-      for p = 1:numel(props)
-        s.(props{p}) = obj.(props{p});
-      end
-    end % end of saveToStruct
-    
-  end % end of  private methods
+  end % end of private methods
   
-  
-end
+end % ond of class
 
