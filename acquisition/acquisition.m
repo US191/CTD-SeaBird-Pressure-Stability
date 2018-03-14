@@ -528,7 +528,7 @@ classdef acquisition < handle
         'FontSize',12,...
         'position' , [0.8 0.5 0.15 0.18]);
       
-        uicontrol( obj.hdlPanelResults  ,...
+      uicontrol( obj.hdlPanelResults  ,...
         'style' , 'Text' ,...
         'String' ,' Offset ' ,...
         'units', 'normalized', ...
@@ -646,11 +646,11 @@ classdef acquisition < handle
       set(obj.hdlXmlFile, 'string', obj.xmlFile);
     end
     
-     function selectCtdHeight(obj, src)
+    function selectCtdHeight(obj, src)
       obj.ctdHeight =  get(src, 'string');
-     end
+    end
     
-      function selectBaroHeight(obj, src)
+    function selectBaroHeight(obj, src)
       obj.baroHeight =  get(src, 'string');
     end
     
@@ -961,6 +961,7 @@ classdef acquisition < handle
       % get serial port parameters from uicontrol choices
       % change buttun text
       if get(src, 'userdata') == false
+        set(src,'BackgroundColor', 'y');
         set(src, 'String', 'Initializing...');
         set(src, 'UserData', true);
         
@@ -1023,6 +1024,8 @@ classdef acquisition < handle
       stdev = obj.ringFinal.getStd;
       avg = obj.ringFinal.getAverage;
       var = obj.ringFinal.getVariance;
+      % debug compute
+      %med= 0.3;
       offset = computePressureOffset(obj, med);
       % display value on UiControls
       set(obj.hdlMedian, 'string', num2str(med));
@@ -1030,16 +1033,18 @@ classdef acquisition < handle
       set(obj.hdlMean, 'string', num2str(avg));
       set(obj.hdlVar, 'string', num2str(var));
       set(obj.hdlOffset, 'string', num2str(offset));
+      % construct file name (.asc)
+      obj.statFileName = strcat(obj.path,filesep, obj.station, '.asc');
       % save data on statistic file (.asc)
-      obj.statFileName = strcat(obj.path,filesep,...
-        obj.station, strcat('_',obj.state), '.asc');
-      fid = fopen(obj.statFileName, 'wt');
-      fprintf(fid,'Station: %s\n', strcat(obj.station, '_',obj.state));
+      fid = fopen(obj.statFileName, 'a+');
+      fprintf(fid,'Station: %s (%s)\n', obj.station,obj.state);
+      fprintf(fid,'Date: %s\n', datestr(now));
       fprintf(fid,'Timer: %s\n', obj.delay);
       fprintf(fid, 'Median     Mean    StdDev  Variance\n');
       fprintf(fid, '%f %f %f %f\n', med,avg,stdev,var);
-      fprintf(fid, 'offset CTD     Patm    Tair\n');
-      fprintf(fid, '%f %f %f\n', offset,obj.pressureBaro,obj.tAir);
+      fprintf(fid, 'offset   Patm    Tair\n');
+      fprintf(fid, '%5.2f   %6.1f   %4.1f\n\n', offset,str2double(obj.pressureBaro),...
+        str2double(obj.tAir));
       fclose(fid);
     end % end of stopAcquisition
     
@@ -1139,11 +1144,11 @@ classdef acquisition < handle
       
       % compute
       % atmospheric pressure at sea level in dbar (Meteo-France)
-      P_atm    = (P_baro + ((P_baro * H_baro) / (29.2 * (T_air + K)))) * 0.01; 
+      P_atm    = (P_baro + ((P_baro * H_baro) / (29.2 * (T_air + K)))) * 0.01;
       % CTD absolute pressure from seabird relative pressure in dbar
-      P_CTDa   = ctdPressure + (Ap * C);  
+      P_CTDa   = ctdPressure + (Ap * C);
       % CTD absolute pressure at sea level in dbar (Meteo-France)
-      P_CTDa0  = (P_CTDa + ((P_CTDa * H_CTD) / (29.2 * (T_air + K))));         
+      P_CTDa0  = (P_CTDa + ((P_CTDa * H_CTD) / (29.2 * (T_air + K))));
       
       % SeaBird pressure sensor offset
       offset   = P_atm - P_CTDa0;
