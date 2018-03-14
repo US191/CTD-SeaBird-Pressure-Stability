@@ -71,11 +71,15 @@ classdef acquisition < handle
     paritySbe35 = 1     % default none
     terminatorSbe35 = 3 % default 'CR/LF'
     
-    ctdHeight = 3
-    baroHeight = 10
+    % constants for Thalassa
+    ctdHeight = 3.5
+    baroHeight = 7.8
+    
+    % value enter by user at each profil
     pressureBaro
     tAir
     
+    % hable for listener 'dataAvailable'
     dataListenerHandle
     
   end
@@ -597,8 +601,8 @@ classdef acquisition < handle
       obj.terminatorSbe35 =  get(src, 'value');
     end
     
-    function selectStationSbe35(obj, src)
-      obj.stationSbe35 =  get(src, 'string');
+    function selectStation(obj, src)
+      obj.station =  get(src, 'string');
     end
     
     function selectPressureBaro(obj, src)
