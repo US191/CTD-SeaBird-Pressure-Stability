@@ -1025,7 +1025,8 @@ classdef acquisition < handle
       avg = obj.ringFinal.getAverage;
       var = obj.ringFinal.getVariance;
       % debug compute
-      %med= 0.3;
+      % baro= 1008.6;  Tair=28.1; H_ctd=3.5; H_baro=7.8;
+      % med= 0.0; offest = -0.04;
       offset = computePressureOffset(obj, med);
       % display value on UiControls
       set(obj.hdlMedian, 'string', num2str(med));
@@ -1035,16 +1036,19 @@ classdef acquisition < handle
       set(obj.hdlOffset, 'string', num2str(offset));
       % construct file name (.asc)
       obj.statFileName = strcat(obj.path,filesep, obj.station, '.asc');
+      
       % save data on statistic file (.asc)
-      fid = fopen(obj.statFileName, 'a+');
-      fprintf(fid,'Station: %s (%s)\n', obj.station,obj.state);
-      fprintf(fid,'Date: %s\n', datestr(now));
-      fprintf(fid,'Timer: %s\n', obj.delay);
-      fprintf(fid, 'Median     Mean    StdDev  Variance\n');
-      fprintf(fid, '%f %f %f %f\n', med,avg,stdev,var);
-      fprintf(fid, 'offset   Patm    Tair\n');
-      fprintf(fid, '%5.2f   %6.1f   %4.1f\n\n', offset,str2double(obj.pressureBaro),...
-        str2double(obj.tAir));
+      if exist(obj.statFileName, 'file')
+        fid = fopen(obj.statFileName, 'a+');
+      else
+        fid = fopen(obj.statFileName, 'w');
+        fprintf(fid, ['Station    Date              State Timer Median',...
+          'Mean StdDevVariance Patm  Tair  Offset\n']);
+      end
+      fprintf(fid,'%s %s %6s %s %5.2f %5.2f %5.3f %5.3f %6.1f  %4.1f %5.2f\n', ...
+        obj.station, datestr(now), obj.state,obj.delay,...
+        med, avg, stdev, var, str2double(obj.pressureBaro),...
+        str2double(obj.tAir), offset );
       fclose(fid);
     end % end of stopAcquisition
     
