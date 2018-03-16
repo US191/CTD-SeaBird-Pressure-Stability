@@ -962,6 +962,11 @@ classdef acquisition < handle
     % start acquisition
     function startAcquisition(obj, src)
       
+      if isempty(obj.pressureBaro) || isempty(obj.tAir)
+        msgbox({'You must enter values for : ', ...
+          'Barometric pressure and Air temperature'}, 'Missing entries');
+        return
+      end
       % get serial port parameters from uicontrol choices
       % change buttun text
       if get(src, 'userdata') == false
