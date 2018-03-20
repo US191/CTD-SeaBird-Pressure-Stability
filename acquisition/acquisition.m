@@ -17,7 +17,7 @@ classdef acquisition < handle
   
   properties (Access = public)
     
-    VERSION = '0.10';
+    VERSION = '0.11';
     
     % list of public or private properties to save in config mat file
     propertiesToSave = {'VERSION',...
@@ -187,6 +187,16 @@ classdef acquisition < handle
       obj.setUiMenus;
       obj.setUicontrols;
       
+      % if file is created, set checkbox to 'after', 'before' if not
+      obj.statFileName = strcat(obj.path,filesep, obj.station, '.asc');
+      if exist(obj.statFileName, 'file')
+        obj.state = 'after';
+        set(obj.hdlCheckboxAfter,'Value',1);
+      else
+        obj.state = 'before';
+        set(obj.hdlCheckboxBefore,'Value',1);
+      end
+      
       
     end % end of constructor
     
@@ -286,36 +296,38 @@ classdef acquisition < handle
         'tag', 'PATH_SELECT', ...
         'callback', {@(src,evt) selectPath(obj)});
       
-      % CheckBox
-      if strcmp(obj.state, 'before')
-        value = 1;
-      else
-        value = 0;
-      end
-      obj.hdlCheckboxBefore = uicontrol( obj.hdlConfigPanel ,...
-        'style' , 'checkbox' ,...
-        'String' , ' Before profil',...
-        'value', value,...
+      % Radio buton group
+      bg = uibuttongroup(obj.hdlConfigPanel ,...
+        'Visible','on',...
         'units', 'normalized', ...
-        'HorizontalAlignment', 'left',...
-        'Position', [leftAlign 0.46 0.2 0.1] ,...
-        'FontSize',10,...
-        'callback', {@(src,evt) selectBeforeStation(obj,src)});
+        'Position',[leftAlign 0.32 .18 .26],...
+        'SelectionChangedFcn',{@(src,evt) selectBeforeAfterStation(obj,src,evt)});
       
-      if strcmp(obj.state, 'after')
-        value = 1;
+      if strcmp(obj.state, 'before')
+        before.value = 1;
+        after.value = 0;
       else
-        value = 0;
+        before.value = 0;
+        after.value = 1;
       end
-      obj.hdlCheckboxAfter = uicontrol( obj.hdlConfigPanel , ...
-        'style' , 'checkbox' ,...
-        'String' , ' After profil',...
-        'value', value,...
+      
+      obj.hdlCheckboxBefore = uicontrol( bg ,...
+        'style' , 'radiobutton' ,...
+        'String' , ' Before profil',...
+        'value', before.value,...
         'units', 'normalized', ...
         'HorizontalAlignment', 'left',...
-        'Position' ,[leftAlign 0.35 0.2 0.1] ,...
-        'FontSize',10, ...
-        'callback', {@(src,evt) selectAfterStation(obj,src)});
+        'Position', [leftAlign 0.6 0.9 0.4] ,...
+        'FontSize',10);
+      
+      obj.hdlCheckboxAfter = uicontrol( bg , ...
+        'style' , 'radiobutton' ,...
+        'String' , ' After profil',...
+        'value', after.value,...
+        'units', 'normalized', ...
+        'HorizontalAlignment', 'left',...
+        'Position' ,[leftAlign 0.11 0.9 0.4] ,...
+        'FontSize',10);
       
       % timer
       uicontrol( obj.hdlConfigPanel ,...
@@ -601,8 +613,17 @@ classdef acquisition < handle
       obj.terminatorSbe35 =  get(src, 'value');
     end
     
+    % main figure
     function selectStation(obj, src)
       obj.station =  get(src, 'string');
+      obj.statFileName = strcat(obj.path,filesep, obj.station, '.asc');
+      if exist(obj.statFileName, 'file')
+        obj.state = 'after';
+        set(obj.hdlCheckboxAfter,'Value',1);
+      else
+        obj.state = 'before';
+        set(obj.hdlCheckboxBefore,'Value',1);
+      end
     end
     
     function selectPressureBaro(obj, src)
@@ -617,21 +638,11 @@ classdef acquisition < handle
       obj.delay =  get(src, 'string');
     end
     
-    function selectBeforeStation(obj,src)
-      if get(src, 'value')
+    function selectBeforeAfterStation(obj,~,evt)
+      if evt.NewValue.Value && strcmp(evt.NewValue.String,' Before profil')
         obj.state =  'before';
-        set(obj.hdlCheckboxAfter,'value',0);
       else
-        set(src, 'value', 1);
-      end
-    end
-    
-    function selectAfterStation(obj,src)
-      if get(src, 'value')
         obj.state =  'after';
-        set(obj.hdlCheckboxBefore,'value',0);
-      else
-        set(src, 'value', 1);
       end
     end
     
@@ -968,7 +979,7 @@ classdef acquisition < handle
         return
       end
       % get serial port parameters from uicontrol choices
-      % change buttun text
+      % change button text
       if get(src, 'userdata') == false
         set(src,'BackgroundColor', 'y');
         set(src, 'String', 'Initializing...');
