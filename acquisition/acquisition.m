@@ -17,7 +17,7 @@ classdef acquisition < handle
   
   properties (Access = public)
     
-    VERSION = '0.11';
+    VERSION = '0.12';
     
     % list of public or private properties to save in config mat file
     propertiesToSave = {'VERSION',...
@@ -34,7 +34,7 @@ classdef acquisition < handle
     ringFinal
     
     
-    station = 'FR28001'
+    station = 'TEST'
     state   = 'before'      % before or after station
     delay   = '5'  % default, 5 s
     path    = 'data'
@@ -72,8 +72,8 @@ classdef acquisition < handle
     terminatorSbe35 = 3 % default 'CR/LF'
     
     % constants for Thalassa
-    ctdHeight = 3.5
-    baroHeight = 7.8
+    ctdHeight = '3.5'
+    baroHeight = '7.8'
     
     % value enter by user at each profil
     pressureBaro
@@ -1094,6 +1094,7 @@ classdef acquisition < handle
       set(obj.hdlMean, 'string', num2str(obj.ringAvg.getAverage));
       % put every second median value to ringFinal
       obj.ringFinal.put(obj.ringAvg.getMedian);
+      %disp(obj.ringFinal.data)
     end
     
     % call from close figure
@@ -1152,6 +1153,7 @@ classdef acquisition < handle
     function offset = computePressureOffset(obj, ctdPressure)
       
       % Environment
+      disp(ctdPressure)
       P_baro = str2double(obj.pressureBaro); % atmospheric pressure in mbar from barometer
       T_air = str2double(obj.tAir);   % air temperature in °C
       
