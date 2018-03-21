@@ -17,7 +17,7 @@ classdef acquisition < handle
   
   properties (Access = public)
     
-    VERSION = '0.12';
+    VERSION = '0.13';
     
     % list of public or private properties to save in config mat file
     propertiesToSave = {'VERSION',...
@@ -36,7 +36,7 @@ classdef acquisition < handle
     
     station = 'TEST'
     state   = 'before'      % before or after station
-    delay   = '5'  % default, 5 s
+    delay   = 10  % default, 5 s
     path    = 'data'
     xmlFile = 'data/1263.xml'
     
@@ -72,8 +72,8 @@ classdef acquisition < handle
     terminatorSbe35 = 3 % default 'CR/LF'
     
     % constants for Thalassa
-    ctdHeight = '3.5'
-    baroHeight = '7.8'
+    ctdHeight = 3.5
+    baroHeight = 7.8
     
     % value enter by user at each profil
     pressureBaro
@@ -252,7 +252,7 @@ classdef acquisition < handle
       
       obj.hdlSelectBaro = uicontrol(obj.hdlConfigPanel,...
         'style', 'edit', ...
-        'string', obj.pressureBaro, ...
+        'string', num2str(obj.pressureBaro), ...
         'units', 'normalized', ...
         'position', [leftAlign+leftOffset 0.83 0.13 0.09], ...
         'callback', {@(src,evt) selectPressureBaro(obj,src)});
@@ -267,7 +267,7 @@ classdef acquisition < handle
       
       obj.hdlSelectTair = uicontrol(obj.hdlConfigPanel,...
         'style', 'edit', ...
-        'string', obj.tAir, ...
+        'string', num2str(obj.tAir), ...
         'units', 'normalized', ...
         'position', [leftAlign+leftOffset 0.83 0.13 0.09], ...
         'callback', {@(src,evt) selectTair(obj,src)});
@@ -340,7 +340,7 @@ classdef acquisition < handle
       
       obj.hdSelectdelay = uicontrol ( obj.hdlConfigPanel ,...
         'style' , ' edit' ,...
-        'string', obj.delay,...
+        'string', num2str(obj.delay),...
         'units', 'normalized', ...
         'HorizontalAlignment', 'left',...
         'BackGroundcolor','w',...
@@ -563,6 +563,22 @@ classdef acquisition < handle
       
     end % end of setUicontrols
     
+    % display acquisition object
+    % ---------------------
+    function disp(obj)
+      
+      % display properties
+      % ------------------
+      fprintf('  Version:       ''%s''\n',  obj.VERSION);
+      fprintf('  delay:            %2d\n',   obj.delay);
+      fprintf('  ctdHeight:       %3.1f\n', obj.ctdHeight);
+      fprintf('  baroHeight:      %3.1f\n', obj.baroHeight);
+      fprintf('  pressureBaro: %6.1f\n', obj.pressureBaro);
+      fprintf('  tair:           %4.1f\n', obj.tAir);     
+      
+      fprintf('\n');
+    end
+    
     % callback select value from uicontrols
     % --------------------------------------
     function selectPort(obj, src)
@@ -627,15 +643,15 @@ classdef acquisition < handle
     end
     
     function selectPressureBaro(obj, src)
-      obj.pressureBaro =  get(src, 'string');
+      obj.pressureBaro =  str2double(get(src, 'string'));
     end
     
     function selectTair(obj, src)
-      obj.tAir =  get(src, 'string');
+      obj.tAir =  str2double(get(src, 'string'));
     end
     
     function selectTimer(obj, src)
-      obj.delay =  get(src, 'string');
+      obj.delay =  str2double(get(src, 'string'));
     end
     
     function selectBeforeAfterStation(obj,~,evt)
@@ -662,11 +678,11 @@ classdef acquisition < handle
     end
     
     function selectCtdHeight(obj, src)
-      obj.ctdHeight =  get(src, 'string');
+      obj.ctdHeight =  str2double(get(src, 'string'));
     end
     
     function selectBaroHeight(obj, src)
-      obj.baroHeight =  get(src, 'string');
+      obj.baroHeight =  str2double(get(src, 'string'));
     end
     
     % menu option for serial ports, CTD and barometric heigth
@@ -946,7 +962,7 @@ classdef acquisition < handle
       
       obj.hdlSelectCtdHeight = uicontrol ( obj.hdlOptions ,...
         'Style' , 'edit' ,...
-        'String' , obj.ctdHeight ,...
+        'String' , num2str(obj.ctdHeight),...
         'units', 'normalized', ...
         'HorizontalAlignment', 'left',...
         'Position' ,[0.77 0.82 0.1 0.07],...
@@ -963,7 +979,7 @@ classdef acquisition < handle
       
       obj.hdlSelectBaroHeight = uicontrol ( obj.hdlOptions ,...
         'Style' , 'edit' ,...
-        'String' ,obj.baroHeight,...
+        'String' ,num2str(obj.baroHeight),...
         'units', 'normalized', ...
         'HorizontalAlignment', 'left',...
         'Position' ,[0.77 0.66 0.1 0.07],...
@@ -1011,11 +1027,11 @@ classdef acquisition < handle
         ctd.open;
         
         % initialize ring for result
-        obj.ringFinal = ring(str2double(obj.delay));
+        obj.ringFinal = ring(obj.delay);
         
         % start the timer and callback for acquisition
         t = timer('name','timerFinal');
-        t.StartDelay = str2double(obj.delay);
+        t.StartDelay = obj.delay;
         t.TimerFcn = {@obj.stopAcquisition, src, ctd};
         t.StartFcn = {@obj.changeButtonStartToGreen, src};
         t.StopFcn = {@obj.changeButtonStartToRed, src};
@@ -1031,7 +1047,7 @@ classdef acquisition < handle
     % stop acquisition
     function stopAcquisition(obj,t,~,src, ctd)
       set(src, 'UserData', false);
-      fprintf(1,'timer elapsed after delay: %s sec\n', obj.delay);
+      fprintf(1,'timer elapsed after delay: %d sec\n', obj.delay);
       % stop acquisition timer (from obj.delay)
       stop(t);
       delete(t);
@@ -1065,10 +1081,9 @@ classdef acquisition < handle
         fprintf(fid, ['Station    Date              State Timer Median',...
           'Mean StdDevVariance Patm  Tair  Offset\n']);
       end
-      fprintf(fid,'%s %s %6s %s %5.2f %5.2f %5.3f %5.3f %6.1f  %4.1f %5.2f\n', ...
-        obj.station, datestr(now), obj.state,obj.delay,...
-        med, avg, stdev, var, str2double(obj.pressureBaro),...
-        str2double(obj.tAir), offset );
+      fprintf(fid,'%s %s %6s %2d %5.2f %5.2f %5.3f %5.3f %6.1f  %4.1f %5.2f\n', ...
+        obj.station, datestr(now), obj.state, obj.delay,...
+        med, avg, stdev, var, obj.pressureBaro, obj.tAir, offset );
       fclose(fid);
     end % end of stopAcquisition
     
@@ -1132,34 +1147,24 @@ classdef acquisition < handle
       
     end % end of loadConfig
     
-  end % end of public methods
-  
-  methods (Access = private)
-    
-    % wait for dataAvalaible event from CTD
-    function dataEvnt(obj,~,evnt)
-      set(obj.hdlPressure, 'string', num2str(evnt.pressure));
-      set(obj.hdlTemperature, 'string', num2str(evnt.temperature));
-      set(obj.hdlModulo, 'string', num2str(evnt.modulo));
-      set(obj.hdlFrequency, 'string', sprintf('%9.3f',evnt.frequency));
-      % put value to ring buffer
-      obj.ringAvg.put(evnt.pressure)
-      %disp(obj.ringAvg.data);
-    end
-    
     % computePressureOffset calculate offset for SeaBird pressure sensor
     % in dbar from reference barometer
-    % Autor: Pierre Rousselot - US191 IMAGO
+    % example to test offset computation:
+    % a = acquisition
+    % a.computePressureOffset(0.5);
+    %
     function offset = computePressureOffset(obj, ctdPressure)
       
-      % Environment
-      disp(ctdPressure)
-      P_baro = str2double(obj.pressureBaro); % atmospheric pressure in mbar from barometer
-      T_air = str2double(obj.tAir);   % air temperature in °C
+      % display on console input CTD pressure 
+      fprintf(1, 'CTD pressure = %5.2f\n', ctdPressure);
+      
+      % Environment      
+      P_baro = obj.pressureBaro; % atmospheric pressure in mbar from barometer
+      T_air =  obj.tAir;   % air temperature in °C
       
       % Ship
-      H_baro = str2double(obj.baroHeight);    % altitude barometer in meter
-      H_CTD = str2double(obj.ctdHeight);    % altitude CTD in meter
+      H_baro = obj.baroHeight;    % altitude barometer in meter
+      H_CTD =  obj.ctdHeight;    % altitude CTD in meter
       
       % Constants
       %       g        = 9.806;         % standard gravity
@@ -1180,7 +1185,23 @@ classdef acquisition < handle
       offset   = P_atm - P_CTDa0;
       offset = round(offset*100)/100;
       
-      disp(['Offset = ' num2str(offset)]);
+      % display on console offset CTD pressure 
+      fprintf(1, 'Offset = %5.2f\n', offset);
+    end    
+    
+  end % end of public methods
+  
+  methods (Access = private)
+    
+    % wait for dataAvalaible event from CTD
+    function dataEvnt(obj,~,evnt)
+      set(obj.hdlPressure, 'string', num2str(evnt.pressure));
+      set(obj.hdlTemperature, 'string', num2str(evnt.temperature));
+      set(obj.hdlModulo, 'string', num2str(evnt.modulo));
+      set(obj.hdlFrequency, 'string', sprintf('%9.3f',evnt.frequency));
+      % put value to ring buffer
+      obj.ringAvg.put(evnt.pressure)
+      %disp(obj.ringAvg.data);
     end
     
   end % end of private methods
