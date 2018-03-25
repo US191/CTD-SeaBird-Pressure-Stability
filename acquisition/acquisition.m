@@ -1036,7 +1036,8 @@ classdef acquisition < handle
         % open serial port and send commands to the deck-unit
         ctd.open;
         
-        % initialize ring for result
+        % initialize rings for result
+        obj.ringAvg.clear();
         obj.ringFinal = ring(obj.delay);
         
         % start the timer and callback for acquisition
