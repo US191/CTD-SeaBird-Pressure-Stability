@@ -123,6 +123,7 @@ classdef acquisition < handle
     
     
     % Panel acquisition
+    hdlTextStart
     hdlButtonStart
     hdlPressure
     hdlFrequency
@@ -375,9 +376,9 @@ classdef acquisition < handle
       %-------------------------------------------------
       
       % Start
-      uicontrol(obj.hdlPanelMeasure ,...
+      obj.hdlTextStart = uicontrol(obj.hdlPanelMeasure ,...
         'style' , 'Text' , ...
-        'String' ,'Acquisition' ,...
+        'String' , sprintf('Acquisition:  %3d sec', obj.delay),...
         'units', 'normalized', ...
         'HorizontalAlignment', 'left',...
         'Position' , [0.05 0.80 0.2 0.1] ,...
@@ -652,6 +653,9 @@ classdef acquisition < handle
     
     function selectTimer(obj, src)
       obj.delay =  str2double(get(src, 'string'));
+      % reset timer countdown
+      set(obj.hdlTextStart, 'String' , ...
+        sprintf('Acquisition:  %3d sec', obj.delay));
     end
     
     function selectBeforeAfterStation(obj,~,evt)
@@ -989,11 +993,17 @@ classdef acquisition < handle
     % start acquisition
     function startAcquisition(obj, src)
       
+      % test if pressure and tair not empty
       if isempty(obj.pressureBaro) || isempty(obj.tAir)
         msgbox({'You must enter values for : ', ...
           'Barometric pressure and Air temperature'}, 'Missing entries');
         return
       end
+      
+      % reset timer countdown
+      set(obj.hdlTextStart, 'String' , ...
+        sprintf('Acquisition:  %3d sec', obj.delay));
+      
       % get serial port parameters from uicontrol choices
       % change button text
       if get(src, 'userdata') == false
@@ -1031,7 +1041,7 @@ classdef acquisition < handle
         
         % start the timer and callback for acquisition
         t = timer('name','timerFinal');
-        t.StartDelay = obj.delay;
+        t.StartDelay = obj.delay + 1;
         t.TimerFcn = {@obj.stopAcquisition, src, ctd};
         t.StartFcn = {@obj.changeButtonStartToGreen, src};
         t.StopFcn = {@obj.changeButtonStartToRed, src};
@@ -1100,10 +1110,13 @@ classdef acquisition < handle
     end
     
     % every second, get median value from DU and put to ring
-    function getFromRingAvg(obj,~,~)
+    function getFromRingAvg(obj,src,~)
       compute(obj.ringAvg);
       % debug
       disp(obj.ringAvg.getAverage);
+      % display timer countdown
+      set(obj.hdlTextStart, 'String' , ...
+        sprintf('Acquisition:  %3d sec', obj.delay - src.TasksExecuted));
       % display median and mean value every seconde on UiControls
       set(obj.hdlMedian, 'string', num2str(obj.ringAvg.getMedian));
       set(obj.hdlMean, 'string', num2str(obj.ringAvg.getAverage));
@@ -1157,6 +1170,11 @@ classdef acquisition < handle
       
       % display on console input CTD pressure 
       fprintf(1, 'CTD pressure = %5.2f\n', ctdPressure);
+      
+      if isnan(ctdPressure)
+        offset = NaN;
+        return
+      end
       
       % Environment      
       P_baro = obj.pressureBaro; % atmospheric pressure in mbar from barometer
