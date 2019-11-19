@@ -1,5 +1,10 @@
 # Study the SeaBird pressure sensor stability
 
+The objective of this program is to determine the pressure sensor offset of a CTD Seabird 911plus by performing a series of measurements before and after a profile.
+The data is acquired by the deck-unit serial port during 10 seconds, filtered and stored in one file per cast.
+The program calculates the offset using the air temperature, the atmospheric pressure and it's elevation and the determined value can then be used for each sbe-processing profile.
+This program also allows long-term monitoring of sensor drift during a cruise.
+
 ## Input
 
 - .txt SeaBird report file
